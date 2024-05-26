@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    background: #9F7AEA;
+    
+  }
+  
+  .pagination li {
+    display: inline-block;
+    margin: 10px 5px;
+    cursor: pointer;
+   
+  }
+  
+  .pagination li a {
+    font-size: 18px;
+    padding: 5px 10px;
+
+    text-decoration: none;
+    color: white;
+    border-radius: 3px;
+  }
+  
+  .pagination li.active a {
+    font-weight: bold;
+    background: #4A5568;
+    color: white;
+  }
+  
+  .pagination li a:hover {
+    background: #4A5568;
+    color: white;
+
+  }
+  
+  .custom-file-upload {
+    background-color: rgba(0,0,0,0.5);
+    color: white;
+    padding: 10px 20px;
+    font-family: sans-serif;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background-color 0.3s;
+  }
+
+.custom-file-upload:hover {
+    background-color: #2D7AFE;
+}
+
+#actual-btn {
+    display: none;
+}
