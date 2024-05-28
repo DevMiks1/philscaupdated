@@ -15,7 +15,7 @@ const StudentRegistration = () => {
   return (
     <Box px={3} py={5}>
       <Text pb={10} fontWeight="bold" fontSize="18px">
-        Fill your information
+        Fill your reports
       </Text>
       
       <Box>

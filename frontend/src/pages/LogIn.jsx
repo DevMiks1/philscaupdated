@@ -17,10 +17,15 @@ import {
   InputGroup,
   Stack,
   FormHelperText,
-  Select
+  Select,
+  Image,
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useAuth } from "../components/context/Auth";
+import bgImage from "../assets/bg2-1024x574.jpg"
+import logo from "../assets/philscalogo.png"
+
+// import { m } from "framer-motion";
 
 const LogIn = () => {
   const navigate = useNavigate();
@@ -35,8 +40,8 @@ const LogIn = () => {
   const [allUser, setAllUser] = useState([]);
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [errors, setErrors] = useState({});
-  const auth = useAuth()
-  
+  const auth = useAuth();
+
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -93,8 +98,7 @@ const LogIn = () => {
         role: userToSignIn.role,
         picture: userToSignIn.picture,
       };
-      
-      
+
       if (
         userToSignIn.password === password &&
         userToSignIn.role === role.toLowerCase()
@@ -139,8 +143,6 @@ const LogIn = () => {
       });
     }
   };
-  
-  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -179,17 +181,51 @@ const LogIn = () => {
   }
 
   return (
-    <Box height="100vh" position="relative" bg="purple.400">
+    <Box
+      height="100vh"
+      position="relative"
+      // bg="purple.400"
+      _before={{
+        content: '""',
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundImage: `url(${bgImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        filter: "blur(10px)",
+        zIndex: -1,
+      }}
+    >
+      
+      <Box
+        position="absolute"
+        inset="0"
+        bgGradient="linear(to-r, whiteAlpha.75, whiteAlpha.25)"
+        sm={{ bg: "transparent" }}
+        zIndex={0}
+      ></Box>
       <Text
         fontSize="4xl"
         fontWeight="bold"
         position="absolute"
         top="20px"
         left="20px"
-        color="purple.200"
+        color="white"
       >
         Philsca
       </Text>
+      <Image
+        src={logo}
+        alt="Philsca Logo"
+        boxSize="100px"
+        objectFit="contain"
+        position="absolute"
+        top="20px"
+        right="20px"
+      />
       <Box
         display="flex"
         flexDirection="column"
@@ -203,7 +239,8 @@ const LogIn = () => {
         top="50%"
         left="50%"
         transform="translate(-50%, -50%)"
-        shadow="2xl"
+        shadow="4xl"
+        zIndex={1}
       >
         <Text fontSize="2xl" fontWeight="bold" mb="4" color="purple.500">
           Login
@@ -217,10 +254,10 @@ const LogIn = () => {
                 onChange={handleChange}
                 value={role}
               >
-                <option value="Student">Student</option>
-                <option value="Instructor">Instructor</option>
-                <option value="Staff">Staff</option>
-                <option value="Admin">Admin</option>
+                <option value="student">Student</option>
+                <option value="faculty">Faculty</option>
+                <option value="staff">Staff</option>
+                <option value="admin">Admin</option>
               </Select>
               {errors.role && (
                 <FormHelperText color="red.500">{errors.role}</FormHelperText>
@@ -243,7 +280,7 @@ const LogIn = () => {
               )}
             </FormControl>
 
-            <FormControl isRequired >
+            <FormControl isRequired>
               <FormLabel color="purple.500">Password</FormLabel>
               <InputGroup>
                 <Input
@@ -263,7 +300,6 @@ const LogIn = () => {
                   </Box>
                 </InputRightElement>
               </InputGroup>
-              
             </FormControl>
 
             <FormControl>

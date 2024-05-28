@@ -20,9 +20,7 @@ export const Upload = () => {
   const [firstname, setFirstname] = useState("");
   const [suffix, setSuffix] = useState("");
   const [lastname, setLastname] = useState("");
-  const [course, setCourse] = useState("");
-  const [year, setYear] = useState("");
-  const [birthdate, setBirthdate] = useState("");
+ 
   const auth = useAuth();
 
   const navigate = useNavigate();
@@ -61,13 +59,11 @@ export const Upload = () => {
 
   const fetchUploadImage = async (imageSecureUrl) => {
     const body = {
-      picture: imageSecureUrl,
+      affidavit: imageSecureUrl,
       firstname: firstname,
       lastname: lastname,
       suffix: suffix,
-      course: course,
-      year: year,
-      birthdate: birthdate,
+      
     };
 
     const userSignin = auth.user._id;
@@ -120,7 +116,7 @@ export const Upload = () => {
   return (
     <section className="font-poppins">
       <Box>
-        <Flex gap={5} pb={5}>
+        
           <FormControl>
             <FormLabel>Firstname</FormLabel>
             <Input
@@ -145,35 +141,8 @@ export const Upload = () => {
               onChange={(e) => setLastname(e.target.value)}
             />
           </FormControl>
-        </Flex>
+  
 
-        <Flex gap={5}>
-          <FormControl>
-            <FormLabel>Course</FormLabel>
-            <Input
-              name="course"
-              value={course}
-              onChange={(e) => setCourse(e.target.value)}
-            />
-          </FormControl>
-          <FormControl>
-            <FormLabel>Year</FormLabel>
-            <Input
-              name="year"
-              value={year}
-              onChange={(e) => setYear(e.target.value)}
-            />
-          </FormControl>
-          <FormControl>
-            <FormLabel>Birthdate</FormLabel>
-            <Input
-              type="date"
-              name="address"
-              value={birthdate}
-              onChange={(e) => setBirthdate(e.target.value)}
-            />
-          </FormControl>
-        </Flex>
       </Box>
       <div className="container mx-auto pt-10">
         <form className="">

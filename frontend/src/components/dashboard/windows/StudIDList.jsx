@@ -1,25 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, Card, Divider, List, ListItem, SimpleGrid, Text } from '@chakra-ui/react';
+import {
+  Box, Button, Table, TableCaption, TableContainer,
+  Tbody, Td, Tfoot, Th, Thead, Tr, Input, Select,
+  Flex, Menu, MenuButton, MenuList, MenuItem,
+} from '@chakra-ui/react';
 import IdModal from './prelist/student/idmodal/IdModal';
-import { fetchAccountAPI } from '../../api/AccountsApi'; // Import the API functions
+import { fetchAccountAPI } from '../../api/AccountsApi';
+import { ViewIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
+import ReactPaginate from 'react-paginate';
 
 export default function StudIDList() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [studentData, setStudentData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterCriteria, setFilterCriteria] = useState('');
+
+  const studentsPerPage = 4;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await fetchAccountAPI(); // Fetch student data from the API
+        const data = await fetchAccountAPI();
         setStudentData(data);
       } catch (error) {
-        // Handle error
         console.error("Error fetching student data:", error);
       }
     };
 
-    fetchData(); // Call fetchData function when component mounts
+    fetchData();
   }, []);
 
   const handleViewClick = (student) => {
@@ -32,45 +42,117 @@ export default function StudIDList() {
     setSelectedStudent(null);
   };
 
+  const handlePageClick = ({ selected }) => {
+    setCurrentPage(selected);
+  };
+
+  const pageCount = Math.ceil(studentData.length / studentsPerPage);
+
+  const filteredStudents = studentData
+    .filter(student => {
+      const fullName = `${student.firstname} ${student.lastname}`;
+      return fullName.toLowerCase().includes(searchQuery.toLowerCase());
+    })
+    .filter(student => {
+      if (filterCriteria === '') return true;
+      return student.course === filterCriteria;
+    })
+    .slice(currentPage * studentsPerPage, (currentPage + 1) * studentsPerPage);
+
+  const displayStudents = filteredStudents.map(student => (
+    <Tr key={student.userId}>
+      <Td>{student.firstname} {student.lastname}</Td>
+      <Td>{student.course}</Td>
+      <Td>
+        <Button
+          size="sm"
+          leftIcon={<ViewIcon />}
+          onClick={() => handleViewClick(student)}
+        >
+          View
+        </Button>
+      </Td>
+    </Tr>
+  ));
+
   return (
     <>
-      <SimpleGrid minChildWidth="120px" spacing="10px" mt="20px">
-        {studentData.map((student) => (
-          <Card
-            key={student._id} // Assuming each student object has an _id field
-            bg="purple.200"
-            height="80px"
-            rounded="lg"
-            shadow="lg"
-            p="10px"
-            position="relative"
-          >
-            <List spacing={3}>
-              <ListItem>
-                <Text color="purple.800" fontSize={12}>{student.name}</Text>
-              </ListItem>
-            </List>
-            <Divider borderColor="gray.400" />
-            <Button
-              position="absolute"
-              size="xs"
-              colorScheme="purple"
-              textColor="white"
-              top="50%"
-              left="50%"
-              transform="translate(-50%, -50%)"
-              onClick={() => handleViewClick(student)}
+      <Box margin={10}>
+        <Flex gap={5}>
+          <Box>
+            <Input
+              placeholder="Search by name"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </Box>
+          <Box>
+            <Select
+              placeholder="Filter by course"
+              value={filterCriteria}
+              onChange={(e) => setFilterCriteria(e.target.value)}
             >
-              View
-            </Button>
-          </Card>
-        ))}
-      </SimpleGrid>
-      <IdModal
-        isOpen={modalOpen}
-        onClose={handleCloseModal}
-        studentName={selectedStudent?.name}
-      />
+              <option value="">All Courses</option>
+              <option value="BSIT">BSIT</option>
+              <option value="BSCS">BSCS</option>
+            </Select>
+          </Box>
+        </Flex>
+      </Box>
+
+      <TableContainer mb={4}>
+        <Table variant='simple'>
+          <TableCaption>Student ID List</TableCaption>
+          <Thead>
+            <Tr>
+              <Th>Name</Th>
+              <Th>Course</Th>
+              <Th>Action</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {displayStudents.length > 0 ? (
+              displayStudents
+            ) : (
+              <Tr>
+                <Td colSpan={3} textAlign="center">
+                  No Students Available
+                </Td>
+              </Tr>
+            )}
+          </Tbody>
+          <Tfoot>
+            <Tr>
+              <Th>Name</Th>
+              <Th>Course</Th>
+              <Th>Action</Th>
+            </Tr>
+          </Tfoot>
+        </Table>
+      </TableContainer>
+
+      {studentData.length > studentsPerPage && (
+        <Box h="10vh" pt={10}>
+          <ReactPaginate
+            pageCount={pageCount}
+            pageRangeDisplayed={3}
+            marginPagesDisplayed={2}
+            onPageChange={handlePageClick}
+            containerClassName={"pagination"}
+            activeClassName={"active"}
+            previousLabel={<ChevronLeftIcon />}
+            nextLabel={<ChevronRightIcon />}
+          />
+        </Box>
+      )}
+
+      {selectedStudent && (
+        <IdModal
+          isOpen={modalOpen}
+          onClose={handleCloseModal}
+          student={selectedStudent}
+        />
+      )}
     </>
   );
 }

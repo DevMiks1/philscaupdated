@@ -8,24 +8,22 @@ import {
 import { Box, Button, Flex, Table, Tbody, Td, Text, Th, Thead, Tr } from "@chakra-ui/react";
 import React, { useState } from "react";
 import ReactPaginate from "react-paginate";
+import { Spinner } from "@chakra-ui/react";
 
 const StudentListTable = ({
   accounts,
   setDeleteAccount,
   handleViewAccount,
   handleEditAccount,
+  loading
 }) => {
-  const [currentPage, setCurrentPage] = useState(0);
-  const studentsPerPage = 4;
 
-  const pageCount = Math.ceil(accounts.length / studentsPerPage);
+  const [currentPage, setCurrentPage] = useState(0);
+  const studentsPerPage = 5;
+
 
   const handlePageClick = ({ selected }) => {
     setCurrentPage(selected);
-  };
-
-  const handleDelete = (id) => {
-    setDeleteAccount(id);
   };
 
   const handleViewAccounts = (id) => {
@@ -44,10 +42,10 @@ const StudentListTable = ({
         <Td>{account.userId}</Td>
         <Td>{`${account.firstname} ${account.suffix} ${account.lastname}`}</Td>
         <Td>{account.course}</Td>
-       
+
         <Td>
           <Button
-          size="sm"
+            size="sm"
             leftIcon={<ViewIcon />}
             mr={2}
             onClick={() => {
@@ -57,7 +55,7 @@ const StudentListTable = ({
             View
           </Button>
           <Button
-          size="sm"
+            size="sm"
             leftIcon={<EditIcon />}
             mr={2}
             onClick={() => {
@@ -67,14 +65,14 @@ const StudentListTable = ({
             Edit
           </Button>
           <Button
-          size="sm"
+            size="sm"
             bg="red.500"
             color="white"
             leftIcon={<DeleteIcon />}
             onClick={() => {
               handleDelete(account._id);
             }}
-            _hover={{bg: "red.600"}}
+            _hover={{ bg: "red.600" }}
           >
             Delete
           </Button>
@@ -82,50 +80,73 @@ const StudentListTable = ({
       </Tr>
     ));
 
-  return (
-    <Box as="section">
-      <Box h="60vh" overflow="auto">
-        <Table variant="simple"  w="100%">
-          <Thead>
-            <Tr>
-              <Th>Student ID</Th>
-              <Th w="30%">Name</Th>
-              <Th w="20%">Course</Th>
-             
-              <Th>Actions</Th>
-            </Tr>
-          </Thead>
-          <Tbody overflowX="auto">
-            {accounts.length > 0 ? (
-              <>
-                {displayStudents}
-              </>
-            ) : (
-              <Tr>
-                <Td colSpan={5} textAlign="center">
-                  No Accounts Display
-                </Td>
-              </Tr>
-            )}
-          </Tbody>
-        </Table>
-      </Box>
+  const filteredStudents = accounts.filter((account) => account.role === "student");
+  const pageCount = Math.ceil(filteredStudents.length / studentsPerPage);
 
-      {accounts.length > studentsPerPage && (
-        <Box h="10vh" pt={10}>
-          <ReactPaginate
-            pageCount={pageCount}
-            pageRangeDisplayed={3}
-            marginPagesDisplayed={2}
-            onPageChange={handlePageClick}
-            containerClassName={"pagination"}
-            activeClassName={"active"}
-            previousLabel={<ChevronLeftIcon />}
-            nextLabel={<ChevronRightIcon />}
-          />
-        </Box>
+
+  const handleDelete = (id) => {
+    setDeleteAccount(id);
+    // Reset the current page if it exceeds the new number of pages after deletion
+    if (currentPage >= Math.ceil((filteredStudents.length - 1) / studentsPerPage)) {
+      setCurrentPage(Math.max(0, currentPage - 1));
+    }
+  };
+
+
+  return (
+    <>
+      {loading ? (<Flex justify="center" align="center" h="60vh"><Spinner size="xl" /></Flex>) : (
+        <Box as="section">
+          <Box h="60vh" overflow="auto">
+            <Table variant="simple" w="100%">
+              <Thead>
+                <Tr>
+                  <Th>Student ID</Th >
+                  <Th w="30%">Name</Th>
+                  <Th w="20%">Course</Th>
+
+                  <Th>Actions</Th>
+                </Tr >
+              </Thead >
+              <Tbody overflowX="auto">
+                {displayStudents.length > 0 ? (
+                  <>
+                    {displayStudents}
+                  </>
+                ) : (
+                  <Flex justify="center" align="center" pos="absolute"
+                    top="50%"
+                    left="50%"
+                    transform="translate(-50%, -50%)">
+                    <Text fontSize="1.5rem" fontWeight="bold">No Accouts Display</Text>
+
+                  </Flex>
+                )}
+              </Tbody>
+            </Table >
+          </Box >
+
+          {
+            pageCount > 1 && (
+              <Box h="10vh" pt={20}>
+                <ReactPaginate
+                  pageCount={pageCount}
+                  pageRangeDisplayed={3}
+                  marginPagesDisplayed={2}
+                  onPageChange={handlePageClick}
+                  containerClassName={"pagination"}
+                  activeClassName={"active"}
+                  previousLabel={<ChevronLeftIcon />}
+                  nextLabel={<ChevronRightIcon />}
+                />
+              </Box>
+            )
+          }
+        </Box >
       )}
-    </Box>
+    </>
+
+
   );
 };
 

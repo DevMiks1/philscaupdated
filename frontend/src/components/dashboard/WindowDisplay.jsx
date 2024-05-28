@@ -1,46 +1,40 @@
-import React, { useState } from "react";
-import { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import PreList from "./windows/PreList";
 import StudIDList from "./windows/StudIDList";
 import GraphsAndAnalytics from "./windows/GraphsAndAnalytics";
 import Settings from "./windows/Settings";
-import StudentRegistration from "./windows/StudentRegistration";
 import StudentProfile from "./windows/StudentProfile";
+import Reports from "./windows/Reports";
+import ReportId from "./windows/ReportId";
 
 export const WindowDisplay = ({ tab, allUsers }) => {
   const [display, setDisplay] = useState(null);
 
-  // DISPLAY TOGGLE
   useEffect(() => {
-    if (allUsers && allUsers[0]?.role) {
-      const role = allUsers[0].role;
-      if (role === "admin") {
-        switch (tab) {
-          case "prelist":
-            setDisplay(<PreList />);
-            break;
-          case "studlistid":
-            setDisplay(<StudIDList />);
-            break;
-          case "graphsandanalytics":
-            setDisplay(<GraphsAndAnalytics />);
-            break;
-          case "settings":
-            setDisplay(<Settings />);
-            break;
-          default:
-            setDisplay(null);
-        }
-      } else if (role === "student") {
-        if (tab === "studentregistration") {
-          setDisplay(<StudentRegistration />);
-        } else if (tab === "studentprofile"){
-          setDisplay(<StudentProfile />);
+    if (!allUsers || !allUsers.length) {
+      setDisplay(null);
+      return;
+    }
 
-        }
-      } else {
-        setDisplay(null);
+    const role = allUsers[0].role;
+
+    if (role === "admin") {
+      const components = {
+        prelist: <PreList />,
+        studlistid: <StudIDList />,
+        graphsandanalytics: <GraphsAndAnalytics />,
+        reports: <Reports />,
+        settings: <Settings />,
+      };
+      setDisplay(components[tab] || null);
+    } else if (["student", "faculty", "staff"].includes(role)) {
+      const employee = {
+        profile: <StudentProfile />,
+        reportid: <ReportId />,
       }
+      setDisplay(employee[tab] || null);
+    } else {
+      setDisplay(null);
     }
   }, [tab, allUsers]);
 

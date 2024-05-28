@@ -55,9 +55,16 @@ const StudentProfile = ({
   const [suffix, setSuffix] = useState("");
   const [lastname, setLastname] = useState("");
   const [course, setCourse] = useState("");
+  const [position, setPosition] = useState("");
+  const [designation, setDesignation] = useState("");
+  const [hgt, setHgt] = useState("");
+  const [wgt, setWgt] = useState("");
+  const [sss, setSSS] = useState("");
+  const [tin, setTin] = useState("");
+  const [contactPerson, setContactPerson] = useState("");
   const [year, setYear] = useState("");
   const [birthdate, setBirthdate] = useState("");
-  const [contactNumber, setContactNumber] = useState("");
+  const [contactnumber, setContactNumber] = useState("");
   const navigate = useNavigate();
   const globalUrl = process.env.REACT_APP_GLOBAL_URL;
   const auth = useAuth();
@@ -75,6 +82,7 @@ const StudentProfile = ({
   useEffect(() => {
     fetchAllUsers();
   }, []);
+
 
   const uploadFiles = async () => {
     setLoading(true);
@@ -115,7 +123,7 @@ const StudentProfile = ({
       course: course,
       year: year,
       birthdate: birthdate,
-      contactNumber: contactNumber
+      contactnumber: contactnumber
     };
 
     const userSignin = auth.user._id;
@@ -146,7 +154,7 @@ const StudentProfile = ({
     }
   };
 
-  const handleSubmit = async() => {
+  const handleSubmit = async () => {
     if (images.length < 1) {
       toast({
         title: "Please Fill All the Fields",
@@ -167,7 +175,7 @@ const StudentProfile = ({
         isClosable: true,
         position: "bottom",
       });
-    
+
       onClose(); // Move the modal close outside the if-else block
     }
   };
@@ -183,6 +191,7 @@ const StudentProfile = ({
         const birthdate = user.birthdate;
         const date = birthdate ? new Date(birthdate) : null;
         const formattedDate = date ? date.toISOString().split("T")[0] : "";
+        console.log(formattedDate);
         return (
           <Box key={user._id}>
             <SimpleGrid>
@@ -191,7 +200,7 @@ const StudentProfile = ({
                   <Flex gap={2}>
                     <Box w="120px" h="100px">
                       <WrapItem>
-                        <Avatar size="xl" name={userName} src={user.picture} />
+                        <Avatar size="xl" name={user.firstname} src={user.picture} />
                       </WrapItem>
                     </Box>
                     <Box>
@@ -216,21 +225,75 @@ const StudentProfile = ({
                       <ListIcon as={InfoIcon} color="green.500" />
                       Email: {user.email}
                     </ListItem>
-                    <ListItem>
-                      <ListIcon as={InfoIcon} color="green.500" />
-                      Course: {user.course}
-                    </ListItem>
+                    {["faculty", "staff"].includes(user.role) && (
+                      <ListItem>
+                        <ListIcon as={InfoIcon} color="green.500" />
+                        Position: {user.position}
+                      </ListItem>
+                    )}
+                    {["faculty", "staff"].includes(user.role) && (
+                      <ListItem>
+                        <ListIcon as={InfoIcon} color="green.500" />
+                        Designation: {user.designation}
+                      </ListItem>
+                    )}
+                    {["faculty", "staff"].includes(user.role) && (
+                      <ListItem>
+                        <ListIcon as={InfoIcon} color="green.500" />
+                        HGT: {user.hgt}
+                      </ListItem>
+                    )}
+                    {["faculty", "staff"].includes(user.role) && (
+                      <ListItem>
+                        <ListIcon as={InfoIcon} color="green.500" />
+                        WGT: {user.wgt}
+                      </ListItem>
+                    )}
+                    {["faculty", "staff"].includes(user.role) && (
+                      <ListItem>
+                        <ListIcon as={InfoIcon} color="green.500" />
+                        SSS: {user.sss}
+                      </ListItem>
+                    )}
+                    {["faculty", "staff"].includes(user.role) && (
+                      <ListItem>
+                        <ListIcon as={InfoIcon} color="green.500" />
+                        TIN: {user.tin}
+                      </ListItem>
+                    )}
+                    {user.role === "student" && (
+                      <ListItem>
+                        <ListIcon as={InfoIcon} color="green.500" />
+                        Course: {user.course}
+                      </ListItem>
+                    )}
+                    {
+                      <ListItem>
+                        <ListIcon as={InfoIcon} color="green.500" />
+                        Contact Person: {user.contactperson}
+                      </ListItem>
+                    }
+                    {
+                      <ListItem>
+                        <ListIcon as={InfoIcon} color="green.500" />
+                        Address: {user.address}
+                      </ListItem>
+                    }
+
                     <ListItem>
                       <ListIcon as={InfoIcon} color="green.500" />
                       Date of Birth: {formattedDate}
                     </ListItem>
+                    {user.role === "students" && (
+                      <ListItem>
+                        <ListIcon as={InfoIcon} color="green.500" />
+                        Year: {user.year}
+                      </ListItem>
+                    )}
+
                     <ListItem>
                       <ListIcon as={InfoIcon} color="green.500" />
-                      Year: {user.year}
-                    </ListItem>
-                    <ListItem>
-                      <ListIcon as={InfoIcon} color="green.500" />
-                      Contact No.: {userContactNo}
+                      Contact No: {user.contactnumber}
                     </ListItem>
                     {/* Add more ListItem components for additional details */}
                   </List>
@@ -292,54 +355,155 @@ const StudentProfile = ({
                   </Flex>
 
                   <Flex gap={5} pb={5}>
-                    <FormControl isRequired>
-                      <FormLabel>Course:</FormLabel>
-                      <Input
-                        type="text"
-                        name="course"
-                        value={course}
-                        onChange={(e) => setCourse(e.target.value)}
-                        placeholder="Course"
-                      />
-                    </FormControl>
+                    {["faculty", "staff"].includes(user.role) && (
+                      <FormControl isRequired>
+                        <FormLabel>Position:</FormLabel>
+                        <Input
+                          type="text"
+                          name="course"
+                          value={position}
+                          onChange={(e) => setPosition(e.target.value)}
+                          placeholder="Position"
+                        />
+                      </FormControl>
+                    )}
+                    {["faculty", "staff"].includes(user.role) && (
+                      <FormControl isRequired>
+                        <FormLabel>Designation:</FormLabel>
+                        <Input
+                          type="text"
+                          name="course"
+                          value={designation}
+                          onChange={(e) => setDesignation(e.target.value)}
+                          placeholder="Designation"
+                        />
+                      </FormControl>
+                    )}
+                    {["faculty", "staff"].includes(user.role) && (
+                      <FormControl isRequired>
+                        <FormLabel>HGT:</FormLabel>
+                        <Input
+                          type="text"
+                          name="course"
+                          value={hgt}
+                          onChange={(e) => setHgt(e.target.value)}
+                          placeholder="Height"
+                        />
+                      </FormControl>
+                    )}
+                    {user.role === "student" && (
+                      <FormControl isRequired>
+                        <FormLabel>Course:</FormLabel>
+                        <Input
+                          type="text"
+                          name="course"
+                          value={course}
+                          onChange={(e) => setCourse(e.target.value)}
+                          placeholder="Course"
+                        />
+                      </FormControl>
+                    )}
+
+
+                  </Flex>
+
+                  <Flex gap={5} pb={5}>
+
+
+                    {["faculty", "staff"].includes(user.role) && (
+                      <FormControl isRequired>
+                        <FormLabel>WGT:</FormLabel>
+                        <Input
+                          type="text"
+                          name="course"
+                          value={wgt}
+                          onChange={(e) => setWgt(e.target.value)}
+                          placeholder="Weight"
+                        />
+                      </FormControl>
+                    )}
+                    {["faculty", "staff"].includes(user.role) && (
+                      <FormControl isRequired>
+                        <FormLabel>SSS:</FormLabel>
+                        <Input
+                          type="text"
+                          name="course"
+                          value={sss}
+                          onChange={(e) => setSSS(e.target.value)}
+                          placeholder="SSS"
+                        />
+                      </FormControl>
+                    )}
+                    {["faculty", "staff"].includes(user.role) && (
+                      <FormControl isRequired>
+                        <FormLabel>TIN:</FormLabel>
+                        <Input
+                          type="text"
+                          name="course"
+                          value={tin}
+                          onChange={(e) => setTin(e.target.value)}
+                          placeholder="TIN"
+                        />
+                      </FormControl>
+                    )}
+
+                  </Flex>
+
+                  <Flex gap={5} pb={5}>
+                    {["faculty", "staff"].includes(user.role) && (
+                      <FormControl isRequired>
+                        <FormLabel>Contact Person:</FormLabel>
+                        <Input
+                          type="text"
+                          name="course"
+                          value={contactPerson}
+                          onChange={(e) => setContactPerson(e.target.value)}
+                          placeholder="Contact Person"
+                        />
+                      </FormControl>
+                    )}
                     <FormControl>
                       <FormLabel>Date of Birth:</FormLabel>
                       <Input
                         type="date"
                         name="birthdate"
-                        defaultValuevalue={birthdate}
+                        defaultValue={birthdate}
                         onChange={(e) => setBirthdate(e.target.value)}
                       />
                     </FormControl>
-                  </Flex>
+                    {user.role === "student" && (
 
-                  <Flex gap={5}>
-                    <FormControl isRequired>
-                      <FormLabel>Year:</FormLabel>
-                      <Select
-                        name="year"
-                        value={year}
-                        placeholder="Select Year"
-                        onChange={(e) => setYear(e.target.value)}
-                      >
-                        <option value="1st">1st</option>
-                        <option value="2nd">2nd</option>
-                        <option value="3rd">3rd</option>
-                        <option value="4th">4th</option>
-                      </Select>
-                    </FormControl>
 
+                      <FormControl isRequired>
+                        <FormLabel>Year:</FormLabel>
+                        <Select
+                          name="year"
+                          value={year}
+                          placeholder="Select Year"
+                          onChange={(e) => setYear(e.target.value)}
+                        >
+                          <option value="1st">1st</option>
+                          <option value="2nd">2nd</option>
+                          <option value="3rd">3rd</option>
+                          <option value="4th">4th</option>
+                        </Select>
+                      </FormControl>
+                    )
+                    }
                     <FormControl isRequired>
                       <FormLabel>Contact No.:</FormLabel>
                       <Input
                         type="tel"
                         name="contactNo"
-                        value={contactNumber}
+                        value={contactnumber}
                         onChange={(e) => setContactNumber(e.target.value)}
                         placeholder="Contact Number"
                       />
                     </FormControl>
+
                   </Flex>
+
+
                   <div className="container mx-auto pt-10">
                     <form className="">
                       <div className="flex flex-col justify-center">
@@ -402,7 +566,7 @@ const StudentProfile = ({
                     onClick={handleSubmit}
                     isLoading={loading}
                   >
-                    Post
+                    Update
                   </Button>
                 </ModalFooter>
               </ModalContent>

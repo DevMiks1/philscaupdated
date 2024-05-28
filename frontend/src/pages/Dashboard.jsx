@@ -15,11 +15,11 @@ const DashBoard = () => {
       const role = allUsers[0].role;
       if (role === "student") {
         setTab("studentprofile");
-      } else {
-        setTab("defaultTab"); // Set a default tab if user is not a student
+      } else if(["faculty", "instructor"].includes(role)){
+        setTab("profile"); // Set a default tab if user is not a student
       }
     } else {
-      setTab("defaultTab"); // Set a default tab if no user or role is undefined
+      setTab("prelist"); // Set a default tab if no user or role is undefined
     }
   }, [allUsers]);
 
@@ -39,7 +39,7 @@ const DashBoard = () => {
           w={{ md: "8%", lg: "20%", xl: "20%" }}
           bg="purple.400"
           color="white"
-          h="100%"
+          
         >
           <SideBar
             tab={tab}

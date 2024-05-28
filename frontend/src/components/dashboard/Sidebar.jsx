@@ -35,7 +35,6 @@ import { useAuth } from "../context/Auth";
 
 export const SideBar = ({ setTab, tab, allUsers, setAllUsers }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  
 
   const auth = useAuth();
 
@@ -58,11 +57,9 @@ export const SideBar = ({ setTab, tab, allUsers, setAllUsers }) => {
     onClose();
   };
 
-  const menu = <></>;
-
   // SIDE BAR
   return (
-    <div className="px-3 sticky top-0 h-full">
+    <div className="px-3 sticky top-0 h-[100vh]  ">
       {/* DRAWER BUTTON */}
       <Box
         cursor="pointer"
@@ -75,7 +72,6 @@ export const SideBar = ({ setTab, tab, allUsers, setAllUsers }) => {
       </Box>
       <Flex flexDir="column" justify="space-between" h="100%" py={5}>
         <VStack display={{ base: "none", md: "none", lg: "block" }} spacing={2}>
-          {menu}
           {allUsers.map((user) => {
             if (user.role === "admin" && user._id === authId) {
               return (
@@ -153,6 +149,29 @@ export const SideBar = ({ setTab, tab, allUsers, setAllUsers }) => {
                   </Link>
                   <Link
                     onClick={(e) => {
+                      setTab("reports");
+                      onClose();
+                    }}
+                  >
+                    <Flex
+                      align="center"
+                      gap={2}
+                      backgroundColor={tab === "reports" ? "gray.600" : ""}
+                      borderRadius={5}
+                      px={2}
+                      py={2}
+                      mb={2}
+                      _hover={{
+                        bg: "gray.600",
+                        borderRadius: "5",
+                      }}
+                    >
+                      <Icon as={FaBox} />
+                      <Text>Reports</Text>
+                    </Flex>
+                  </Link>
+                  <Link
+                    onClick={(e) => {
                       setTab("settings");
                       onClose();
                     }}
@@ -182,66 +201,66 @@ export const SideBar = ({ setTab, tab, allUsers, setAllUsers }) => {
           })}
 
           {allUsers
-            .filter((user) => user.role === "student" && user._id === authId)
+            .filter(
+              (user) =>
+                ["student", "faculty", "staff"].includes(user.role) &&
+                user._id === authId
+            )
+
             .map((user) => (
               <Box key={user._id}>
-              <Link
-                // Don't forget to add a unique key for each item in the array
-                onClick={(e) => {
-                  setTab("studentprofile");
-                  onClose();
-                }}
-              >
-                <Flex
-                  align="center"
-                  gap={2}
-                  backgroundColor={
-                    tab === "studentprofile" ? "gray.600" : ""
-                  }
-                  borderRadius={5}
-                  px={2}
-                  py={2}
-                  mb={2}
-                  _hover={{
-                    bg: "gray.600",
-                    borderRadius: "5",
+                <Link
+                  onClick={(e) => {
+                    setTab("profile");
+                    onClose();
                   }}
                 >
-                  <Icon as={FaUsers} />
-                  <Text>Student Profile</Text>
-                </Flex>
-              </Link>
-              <Link
-                 // Don't forget to add a unique key for each item in the array
-                onClick={(e) => {
-                  setTab("studentregistration");
-                  onClose();
-                }}
-              >
-                <Flex
-                  align="center"
-                  gap={2}
-                  backgroundColor={
-                    tab === "studentregistration" ? "gray.600" : ""
-                  }
-                  borderRadius={5}
-                  px={2}
-                  py={2}
-                  mb={2}
-                  _hover={{
-                    bg: "gray.600",
-                    borderRadius: "5",
+                  <Flex
+                    align="center"
+                    gap={2}
+                    backgroundColor={tab === "profile" ? "gray.600" : ""}
+                    borderRadius={5}
+                    px={2}
+                    py={2}
+                    mb={2}
+                    _hover={{
+                      bg: "gray.600",
+                      borderRadius: "5",
+                    }}
+                  >
+                    <Icon as={FaUsers} />
+                    <Text>Profile</Text>
+                  </Flex>
+                </Link>
+                <Link
+                  onClick={(e) => {
+                    setTab("reportid");
+                    onClose();
                   }}
                 >
-                  <Icon as={FaUsers} />
-                  <Text>Student Registration</Text>
-                </Flex>
-              </Link>
+                  <Flex
+                    align="center"
+                    gap={2}
+                    backgroundColor={tab === "reportid" ? "gray.600" : ""}
+                    borderRadius={5}
+                    px={2}
+                    py={2}
+                    mb={2}
+                    _hover={{
+                      bg: "gray.600",
+                      borderRadius: "5",
+                    }}
+                  >
+                    <Icon as={FaBox} />
+                    <Text>Report ID</Text>
+                  </Flex>
+                </Link>
               </Box>
+              
             ))}
         </VStack>
         <Box display={{ base: "none", md: "none", lg: "block" }}>
-          <Profile />
+          <Profile allUsers={allUsers} authId={authId} />
         </Box>
       </Flex>
 
@@ -253,10 +272,208 @@ export const SideBar = ({ setTab, tab, allUsers, setAllUsers }) => {
             <DrawerBody p={0} className="bg-gray-800 text-white">
               <Flex flexDir="column" justify="space-between" h="100%" py={5}>
                 <Flex flexDir="column" mt={5} px={3}>
-                  {menu}
+                  {allUsers.map((user) => {
+                    if (user.role === "admin" && user._id === authId) {
+                      return (
+                        <React.Fragment key={user._id}>
+                          <Link
+                            onClick={(e) => {
+                              setTab("prelist");
+                              onClose();
+                            }}
+                          >
+                            <Flex
+                              align="center"
+                              gap={2}
+                              backgroundColor={
+                                tab === "prelist" ? "gray.600" : ""
+                              }
+                              borderRadius={5}
+                              px={2}
+                              py={2}
+                              mb={2}
+                              _hover={{
+                                bg: "gray.600",
+                                borderRadius: "5",
+                              }}
+                            >
+                              <Icon as={FaUser} />
+                              <Text as="p">Pre List</Text>
+                            </Flex>
+                          </Link>
+                          <Link
+                            onClick={(e) => {
+                              setTab("studlistid");
+                              onClose();
+                            }}
+                          >
+                            <Flex
+                              align="center"
+                              gap={2}
+                              backgroundColor={
+                                tab === "studlistid" ? "gray.600" : ""
+                              }
+                              borderRadius={5}
+                              px={2}
+                              py={2}
+                              mb={2}
+                              _hover={{
+                                bg: "gray.600",
+                                borderRadius: "5",
+                              }}
+                            >
+                              <Icon as={FaChartBar} />
+                              <Text as="p">Student ID List</Text>
+                            </Flex>
+                          </Link>
+                          <Link
+                            onClick={(e) => {
+                              setTab("graphsandanalytics");
+                              onClose();
+                            }}
+                          >
+                            <Flex
+                              align="center"
+                              gap={2}
+                              backgroundColor={
+                                tab === "graphsandanalytics" ? "gray.600" : ""
+                              }
+                              borderRadius={5}
+                              px={2}
+                              py={2}
+                              mb={2}
+                              _hover={{
+                                bg: "gray.600",
+                                borderRadius: "5",
+                              }}
+                            >
+                              <Icon as={FaBox} />
+                              <Text>Graphs&Analytics</Text>
+                            </Flex>
+                          </Link>
+                          <Link
+                            onClick={(e) => {
+                              setTab("reports");
+                              onClose();
+                            }}
+                          >
+                            <Flex
+                              align="center"
+                              gap={2}
+                              backgroundColor={
+                                tab === "reports" ? "gray.600" : ""
+                              }
+                              borderRadius={5}
+                              px={2}
+                              py={2}
+                              mb={2}
+                              _hover={{
+                                bg: "gray.600",
+                                borderRadius: "5",
+                              }}
+                            >
+                              <Icon as={FaBox} />
+                              <Text>Reports</Text>
+                            </Flex>
+                          </Link>
+                          <Link
+                            onClick={(e) => {
+                              setTab("settings");
+                              onClose();
+                            }}
+                          >
+                            <Flex
+                              align="center"
+                              gap={2}
+                              backgroundColor={
+                                tab === "settings" ? "gray.600" : ""
+                              }
+                              borderRadius={5}
+                              px={2}
+                              py={2}
+                              mb={2}
+                              _hover={{
+                                bg: "gray.600",
+                                borderRadius: "5",
+                              }}
+                            >
+                              <Icon as={FaUsers} />
+                              <Text>Settings</Text>
+                            </Flex>
+                          </Link>
+                          {/* Add other admin links here */}
+                        </React.Fragment>
+                      );
+                    } else {
+                      return null; // Return null if the user is not an admin or does not match the authId
+                    }
+                  })}
+
+                  {allUsers
+                    .filter(
+                      (user) =>
+                        ["student", "faculty", "staff"].includes(user.role) &&
+                        user._id === authId
+                    )
+
+                    .map((user) => (
+                      <Box key={user._id}>
+                        <Link
+                          onClick={(e) => {
+                            setTab("profile");
+                            onClose();
+                          }}
+                        >
+                          <Flex
+                            align="center"
+                            gap={2}
+                            backgroundColor={
+                              tab === "profile" ? "gray.600" : ""
+                            }
+                            borderRadius={5}
+                            px={2}
+                            py={2}
+                            mb={2}
+                            _hover={{
+                              bg: "gray.600",
+                              borderRadius: "5",
+                            }}
+                          >
+                            <Icon as={FaUsers} />
+                            <Text>Profile</Text>
+                          </Flex>
+                        </Link>
+                        <Link
+                          onClick={(e) => {
+                            setTab("reportid");
+                            onClose();
+                          }}
+                        >
+                          <Flex
+                            align="center"
+                            gap={2}
+                            backgroundColor={
+                              tab === "reportid" ? "gray.600" : ""
+                            }
+                            borderRadius={5}
+                            px={2}
+                            py={2}
+                            mb={2}
+                            _hover={{
+                              bg: "gray.600",
+                              borderRadius: "5",
+                            }}
+                          >
+                            <Icon as={FaBox} />
+                            <Text>Report ID</Text>
+                          </Flex>
+                        </Link>
+                      </Box>
+                    ))}
+                  {/* Render other user links here */}
                 </Flex>
                 <Box>
-                  <Profile />
+                  <Profile allUsers={allUsers} authId={authId} />
                 </Box>
               </Flex>
             </DrawerBody>

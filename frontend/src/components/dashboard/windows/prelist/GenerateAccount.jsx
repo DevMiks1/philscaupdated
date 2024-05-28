@@ -1,6 +1,6 @@
 /** @format */
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   useToast,
   Button,
@@ -18,18 +18,21 @@ import {
   Box,
   InputGroup,
   InputRightElement
-} from "@chakra-ui/react"; 
+} from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 
 import { createAccountAPI } from "../../../api/AccountsApi";
 
-const GenerateAccount = ({ isOpen, onClose }) => {
+const GenerateAccount = ({ isOpen, onClose, accounts }) => {
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState("student"); // Default role is student
   const [isLoading, setIsLoading] = useState(false);
   const toast = useToast(); // Initialize useToast hook
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,28 +47,53 @@ const GenerateAccount = ({ isOpen, onClose }) => {
       picture: "",
       semestertype: "",
       schoolyear: "",
-      role, 
+      role,
       contactnumber: "",
+      birthdate: "",
+      position: "",
+      designation:  "",
+      hgt: "", 
+      wgt: "",
+      sss: "",
+      tin: "",
+      contactperson: "",
+      affidavit: "",
+      
+
+
     };
 
     try {
-      // Call the createAccountAPI function with email, password, and role
-      await createAccountAPI({ body: body });
-      // Optionally, you can perform additional actions after account creation
-      console.log("Account created successfully!");
-      // Show success toast notification
-      toast({
-        title: "Account created successfully!",
-        status: "success",
-        duration: 5000, // Optional: Set duration for how long the toast will be displayed (in milliseconds)
-        isClosable: true, // Optional: Allow the user to close the toast manually
-      });
-      // Reset form fields
-      setEmail("");
-      setPassword("");
-      setRole("student"); // Reset the role to default
-      // Close the modal after successful account creation
-      onClose();
+      const existingEmail = accounts.some((account) => account.email === email)
+
+      if (existingEmail) {
+        toast({
+          title: "Email is already taken!",
+          status: "error",
+          duration: 5000, // Optional: Set duration for how long the toast will be displayed (in milliseconds)
+          isClosable: true, // Optional: Allow the user to close the toast manually
+        });
+      } else {
+        // Call the createAccountAPI function with email, password, and role
+        await createAccountAPI({ body: body });
+        // Optionally, you can perform additional actions after account creation
+        console.log("Account created successfully!");
+        // Show success toast notification
+        toast({
+          title: "Account created successfully!",
+          status: "success",
+          duration: 5000, // Optional: Set duration for how long the toast will be displayed (in milliseconds)
+          isClosable: true, // Optional: Allow the user to close the toast manually
+        });
+        // Reset form fields
+        setEmail("");
+        setPassword("");
+        setRole("student"); // Reset the role to default
+        // Close the modal after successful account creation
+        onClose();
+      }
+
+
     } catch (error) {
       console.error("Error creating account:", error);
       // Show error toast notification

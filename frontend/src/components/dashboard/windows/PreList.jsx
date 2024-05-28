@@ -14,7 +14,7 @@ import {
   useDisclosure,
   Spacer,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import StudentListTable from "./prelist/student/StudentListTable";
 import { DeleteAccountModal } from "./prelist/student/crud_prelist/DeleteAccount";
 import { fetchAccountAPI } from "../../api/AccountsApi";
@@ -31,6 +31,7 @@ const PreList = () => {
   const [viewAccount, setViewAccount] = useState(null);
   const [editAccount, setEditAccount] = useState(null);
   const [generateAccount, setGenerateAccount] = useState(null);
+  const [loading, setLoading] = useState(true);
   const {
     isOpen: isViewOpen,
     onOpen: onViewOpen,
@@ -48,25 +49,24 @@ const PreList = () => {
     onClose: onGenerateClose,
   } = useDisclosure();
 
-  const updateAccount = (updatedAccount) => {
-    setAccounts((prevAccounts) =>
-      prevAccounts.map((acc) =>
-        acc._id === updatedAccount._id ? updatedAccount : acc
-      )
-    );
-  };
+ 
+  
+  
+
   useEffect(() => {
     const fetchAccount = async () => {
       try {
         const data = await fetchAccountAPI();
         setAccounts(data);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
+        setLoading(false)
       }
     };
 
     fetchAccount();
-  }, [updateAccount]);
+  }, [accounts]);
 
   const handleViewAccount = (accountId) => {
     const account = accounts.find((acc) => acc._id === accountId);
@@ -90,7 +90,7 @@ const PreList = () => {
       <Tabs colorScheme="purple" variant="enclosed">
         <TabList py={10} px={5}>
           <Tab _selected={{ color: "white", bg: "purple.400" }}>Students</Tab>
-          <Tab _selected={{ color: "white", bg: "purple.400" }}>Instructor</Tab>
+          <Tab _selected={{ color: "white", bg: "purple.400" }}>Faculty</Tab>
           <Tab _selected={{ color: "white", bg: "purple.400" }}>Staff</Tab>
           <Spacer />
           <Button
@@ -107,6 +107,7 @@ const PreList = () => {
             <List>
               <ListItem>
                 <StudentListTable
+                  loading={loading}
                   accounts={accounts}
                   setDeleteAccount={setDeleteAccount}
                   handleViewAccount={handleViewAccount}
@@ -120,6 +121,7 @@ const PreList = () => {
             <List>
               <ListItem>
                 <InstructorListTable
+                loading={loading}
                   accounts={accounts}
                   setDeleteAccount={setDeleteAccount}
                   handleViewAccount={handleViewAccount}
@@ -133,6 +135,7 @@ const PreList = () => {
             <List>
               <ListItem>
                 <StaffListTable
+                  loading={loading}
                   accounts={accounts}
                   setDeleteAccount={setDeleteAccount}
                   handleViewAccount={handleViewAccount}
@@ -166,11 +169,11 @@ const PreList = () => {
           isOpen={isEditOpen}
           onClose={onEditClose}
           account={editAccount}
-          updateAccount={updateAccount}
+          
         />
       )}
       {generateAccount && (
-        <GenerateAccount isOpen={isGenerateOpen} onClose={onGenerateClose} />
+        <GenerateAccount isOpen={isGenerateOpen} onClose={onGenerateClose} accounts={accounts}/>
       )}
     </>
   );

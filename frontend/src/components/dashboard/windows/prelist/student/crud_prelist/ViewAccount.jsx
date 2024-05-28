@@ -23,12 +23,14 @@ const ViewAccount = ({ isOpen, onClose, account }) => {
   if (!account) return null;
 
   const birthdate = account.birthdate;
-const date = birthdate ? new Date(birthdate) : null;
-const formattedDate = date ? date.toISOString().split("T")[0] : "";
+  const date = birthdate ? new Date(birthdate) : null;
+  const formattedDate = date ? date.toISOString().split("T")[0] : "";
 
+  const students = account.role === "student";
+  const employee = ["faculty", "staff"].includes(account.role);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} size="xl">
       <ModalOverlay />
       <ModalContent>
         <Flex w="100%">
@@ -52,37 +54,24 @@ const formattedDate = date ? date.toISOString().split("T")[0] : "";
               py={2}
               px={3}
               borderRadius={10}
+              h={account.name ? "80px" : "80px"}
             >
               <Text fontWeight="bold">Name:</Text>
               {`${account.firstname} ${account.suffix} ${account.lastname}`}
             </Box>
-            <Box
-              bg="gray.600"
-              color="white"
-              w="100%"
-              py={2}
-              px={3}
-              borderRadius={10}
-            >
-              <Text fontWeight="bold">Course:</Text>
-              {account.course}
-            </Box>
-          </Flex>
-        </ModalBody>
-
-        <ModalBody>
-          <Flex gap={3}>
-            <Box
-              bg="gray.600"
-              color="white"
-              w="100%"
-              py={2}
-              px={3}
-              borderRadius={10}
-            >
-              <Text fontWeight="bold">Year:</Text>
-              {account.year}
-            </Box>
+            {students && (
+              <Box
+                bg="gray.600"
+                color="white"
+                w="100%"
+                py={2}
+                px={3}
+                borderRadius={10}
+              >
+                <Text fontWeight="bold">Course:</Text>
+                {account.course}
+              </Box>
+            )}
             <Box
               bg="gray.600"
               color="white"
@@ -94,9 +83,123 @@ const formattedDate = date ? date.toISOString().split("T")[0] : "";
               <Text fontWeight="bold">Address:</Text>
               {account.address}
             </Box>
+            {employee && (
+              <Box
+                bg="gray.600"
+                color="white"
+                w="100%"
+                py={2}
+                px={3}
+                borderRadius={10}
+              >
+                <Text fontWeight="bold">Position:</Text>
+                {account.position}
+              </Box>
+            )}
           </Flex>
         </ModalBody>
 
+        <ModalBody>
+          <Flex gap={3}>
+            {students && (
+              <>
+                <Box
+                  bg="gray.600"
+                  color="white"
+                  w="100%"
+                  py={2}
+                  px={3}
+                  borderRadius={10}
+                  h={account.year ? "80px" : "80px"}
+                >
+                  <Text fontWeight="bold">Year:</Text>
+                  {account.year}
+                </Box>
+                <Box
+                  bg="gray.600"
+                  color="white"
+                  w="100%"
+                  py={2}
+                  px={3}
+                  borderRadius={10}
+                >
+                  <Text fontWeight="bold">Contact Person:</Text>
+                  {account.contactperson}
+                </Box>
+              </>
+            )}
+            {employee && (
+              <>
+                <Box
+                  bg="gray.600"
+                  color="white"
+                  w="100%"
+                  py={2}
+                  px={3}
+                  borderRadius={10}
+                  h={account.designation ? "80px" : "80px"}
+                >
+                  <Text fontWeight="bold">Designation:</Text>
+                  {account.designation}
+                </Box>
+                <Box
+                  bg="gray.600"
+                  color="white"
+                  w="100%"
+                  py={2}
+                  px={3}
+                  borderRadius={10}
+                >
+                  <Text fontWeight="bold">HGT:</Text>
+                  {account.hgt}
+                </Box>
+                <Box
+                  bg="gray.600"
+                  color="white"
+                  w="100%"
+                  py={2}
+                  px={3}
+                  borderRadius={10}
+                >
+                  <Text fontWeight="bold">WGT:</Text>
+                  {account.wgt}
+                </Box>
+              </>
+            )}
+          </Flex>
+        </ModalBody>
+
+        {employee && (
+          <ModalBody>
+            <Flex gap={3}>
+              <>
+                <Box
+                  bg="gray.600"
+                  color="white"
+                  w="100%"
+                  py={2}
+                  px={3}
+                  borderRadius={10}
+                  h="70px"
+                >
+                  <Text fontWeight="bold">SSS:</Text>
+                  {account.sss}
+                </Box>
+                <Box
+                  bg="gray.600"
+                  color="white"
+                  w="100%"
+                  py={2}
+                  px={3}
+                  borderRadius={10}
+                >
+                  <Text fontWeight="bold">TIN:</Text>
+                  {account.tin}
+                </Box>
+              </>
+            </Flex>
+          </ModalBody>
+        )}
         <ModalBody>
           <Flex gap={3}>
             <Box
@@ -106,6 +209,7 @@ const formattedDate = date ? date.toISOString().split("T")[0] : "";
               py={2}
               px={3}
               borderRadius={10}
+              h="70px"
             >
               <Text fontWeight="bold">Birthdate:</Text>
               {formattedDate}
@@ -118,8 +222,8 @@ const formattedDate = date ? date.toISOString().split("T")[0] : "";
               px={3}
               borderRadius={10}
             >
-              <Text fontWeight="bold">Gender:</Text>
-              {account.gender}
+              <Text fontWeight="bold">Contact No:</Text>
+              {account.contactnumber}
             </Box>
           </Flex>
         </ModalBody>
@@ -132,9 +236,21 @@ const formattedDate = date ? date.toISOString().split("T")[0] : "";
               py={2}
               px={3}
               borderRadius={10}
+              h="70px"
             >
               <Text fontWeight="bold">Email:</Text>
               {account.email}
+            </Box>
+            <Box
+              bg="gray.600"
+              color="white"
+              w="100%"
+              py={2}
+              px={3}
+              borderRadius={10}
+            >
+              <Text fontWeight="bold">Password:</Text>
+              {account.password}
             </Box>
           </Flex>
         </ModalBody>

@@ -7,7 +7,8 @@ import {
   EditIcon,
   ViewIcon,
 } from "@chakra-ui/icons";
-import { Box, Button, Flex, Grid, GridItem } from "@chakra-ui/react";
+import { Box, Button, Flex, Table, Tbody, Td, Text, Th, Thead, Tr } from "@chakra-ui/react";
+import { Spinner } from "@chakra-ui/react";
 import React, { useState } from "react";
 import ReactPaginate from "react-paginate";
 
@@ -16,19 +17,17 @@ const StaffListTable = ({
   setDeleteAccount,
   handleViewAccount,
   handleEditAccount,
+  loading,
 }) => {
   const [currentPage, setCurrentPage] = useState(0);
-  const studentsPerPage = 5;
+  const staffPerPage = 5;
 
-  const pageCount = Math.ceil(accounts.length / studentsPerPage);
+
 
   const handlePageClick = ({ selected }) => {
     setCurrentPage(selected);
   };
 
-  const handleDelete = (id) => {
-    setDeleteAccount(id);
-  };
 
   const handleViewAccounts = (id) => {
     handleViewAccount(id);
@@ -38,126 +37,123 @@ const StaffListTable = ({
     handleEditAccount(id);
   };
 
-  const displayStudents = accounts
+  const displayStaff = accounts
     .filter((account) => account.role === "staff")
-    .slice(currentPage * studentsPerPage, (currentPage + 1) * studentsPerPage)
+    .slice(currentPage * staffPerPage, (currentPage + 1) * staffPerPage)
     .map((account) => (
-      <Grid
-        gap={4}
-        alignItems="center"
-        templateColumns="repeat(10, 1fr)"
-        key={account._id}
-        py={3}
-        borderBottom="1px solid #4A5568"
-      >
-        <GridItem w="100%" colSpan={2}>
-          {account.userId}
-        </GridItem>
-        <GridItem w="100%" colSpan={2}>
-        {`${account.firstname} ${account.suffix}.  ${account.lastname}`}
-        </GridItem>
-        <GridItem w="100%" colSpan={2}>
-          {account.course}
-        </GridItem>
-        <GridItem w="100%" colSpan={2}>
-          {account.year}
-        </GridItem>
-        <GridItem colSpan={2} gap={2}>
+
+      <Tr key={account._id}>
+        <Td>{account.userId}</Td>
+        <Td>{`${account.firstname} ${account.suffix} ${account.lastname}`}</Td>
+        <Td>{account.course}</Td>
+
+        <Td>
           <Button
-            
+            size="sm"
+            leftIcon={<ViewIcon />}
             mr={2}
             onClick={() => {
               handleViewAccounts(account._id);
             }}
-            
-          ><ViewIcon /></Button>
+          >
+            View
+          </Button>
           <Button
-            
+            size="sm"
+            leftIcon={<EditIcon />}
             mr={2}
             onClick={() => {
               handleEditAccounts(account._id);
             }}
-            
-          ><EditIcon /></Button>
+          >
+            Edit
+          </Button>
           <Button
+            size="sm"
             bg="red.500"
             color="white"
-            _hover={{bg: "red.600"}}
+            leftIcon={<DeleteIcon />}
             onClick={() => {
               handleDelete(account._id);
             }}
-            
+            _hover={{ bg: "red.600" }}
           >
-            <DeleteIcon />
+            Delete
           </Button>
-        </GridItem>
-      </Grid>
+        </Td>
+      </Tr>
+
     ));
 
+  const filteredStaff = accounts.filter((account) => account.role === "staff");   
+
+  const pageCount = Math.ceil(filteredStaff.length / staffPerPage);
+
+  const handleDelete = (id) => {
+    setDeleteAccount(id);
+    // Reset the current page if it exceeds the new number of pages after deletion
+    if (currentPage >= Math.ceil((filteredStaff.length - 1) / staffPerPage)) {
+      setCurrentPage(Math.max(0, currentPage - 1));
+    }
+  };
+
   return (
-    <Box as="section">
-      <Box h="60vh">
-        <Box>
-          <Grid
-            gap={4}
-            templateColumns="repeat(10, 1fr)"
-            borderBottom="1px solid #4A5568"
-            py={5}
-          >
-            <GridItem w="100%" colSpan={2} fontSize="18px" fontWeight="bold">
-              Student ID
-            </GridItem>
-            <GridItem w="100%" colSpan={2} fontSize="18px" fontWeight="bold">
-              Name
-            </GridItem>
-            <GridItem w="100%" colSpan={2} fontSize="18px" fontWeight="bold">
-              Course
-            </GridItem>
-            <GridItem w="100%" colSpan={2} fontSize="18px" fontWeight="bold">
-              Year
-            </GridItem>
+    <>
+      {loading ? (<Flex justify="center" align="center" h="60vh"><Spinner size="xl" /></Flex>) : (
+        <Box as="section">
+          <Box h="60vh" overflow="auto">
+            <Table variant="simple" w="100%">
+              <Thead>
+                <Tr>
+                  <Th>Faculty ID</Th >
+                  <Th w="30%">Name</Th>
+                  <Th w="20%">Position</Th>
 
-            <GridItem
-              w="100%"
-              colSpan={2}
-              textAlign="center"
-              fontSize="18px"
-              fontWeight="bold"
-            >
-              Actions
-            </GridItem>
-          </Grid>
-        </Box>
+                  <Th>Actions</Th>
+                </Tr >
+              </Thead >
+              <Tbody overflowX="auto">
+                {displayStaff.length > 0 ? (
+                  <>
+                    {displayStaff}
+                  </>
+                ) : (
 
-        <Box h="100%">
-          {accounts.length > 0 ? (
-            <>{displayStudents}</>
-          ) : (
-            <>
-              <Flex justify="center" align="center" h="100%">
-                No Accounts Display
-              </Flex>
-            </>
-          )}
-        </Box>
-      </Box>
-      {accounts.length > 0 ? (
-        <Box h="10vh" pt={10}>
-          <ReactPaginate
-            pageCount={pageCount}
-            pageRangeDisplayed={3}
-            marginPagesDisplayed={2}
-            onPageChange={handlePageClick}
-            containerClassName={"pagination"}
-            activeClassName={"active"}
-            previousLabel={<ChevronLeftIcon />}
-            nextLabel={<ChevronRightIcon />}
-          />
-        </Box>
-      ) : (
-        <></>
+                  <Flex justify="center" align="center" pos="absolute"
+                    top="50%"
+                    left="50%"
+                    transform="translate(-50%, -50%)">
+                    <Text fontSize="1.5rem" fontWeight="bold">No Accouts Display</Text>
+
+                  </Flex>
+
+
+                )}
+              </Tbody>
+            </Table >
+          </Box >
+
+          {
+            pageCount > 1 && (
+              <Box h="10vh" pt={20}>
+                <ReactPaginate
+                  pageCount={pageCount}
+                  pageRangeDisplayed={3}
+                  marginPagesDisplayed={2}
+                  onPageChange={handlePageClick}
+                  containerClassName={"pagination"}
+                  activeClassName={"active"}
+                  previousLabel={<ChevronLeftIcon />}
+                  nextLabel={<ChevronRightIcon />}
+                />
+              </Box>
+            )
+          }
+        </Box >
       )}
-    </Box>
+    </>
+
+
   );
 };
 
