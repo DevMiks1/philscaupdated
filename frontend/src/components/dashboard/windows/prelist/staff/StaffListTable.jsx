@@ -11,14 +11,15 @@ import { Box, Button, Flex, Table, Tbody, Td, Text, Th, Thead, Tr } from "@chakr
 import { Spinner } from "@chakra-ui/react";
 import React, { useState } from "react";
 import ReactPaginate from "react-paginate";
+import { useData } from "../../../../context/FetchAccountContext";
 
 const StaffListTable = ({
-  accounts,
-  setDeleteAccount,
+
+  handleDeleteAccount,
   handleViewAccount,
   handleEditAccount,
-  loading,
 }) => {
+  const { data, loading, setData } = useData();
   const [currentPage, setCurrentPage] = useState(0);
   const staffPerPage = 5;
 
@@ -37,13 +38,23 @@ const StaffListTable = ({
     handleEditAccount(id);
   };
 
-  const displayStaff = accounts
+  const handleDeleteAccounts = (id) => {
+    handleDeleteAccount(id);
+    console.log(id)
+    if (
+      currentPage >= Math.ceil((filteredStaff.length - 1) / staffPerPage)
+    ) {
+      setCurrentPage(Math.max(0, currentPage - 1));
+    }
+  };
+
+  const displayStaff = data
     .filter((account) => account.role === "staff")
     .slice(currentPage * staffPerPage, (currentPage + 1) * staffPerPage)
     .map((account) => (
 
       <Tr key={account._id}>
-        <Td>{account.userId}</Td>
+        <Td>{account.schoolid}</Td>
         <Td>{`${account.firstname} ${account.suffix} ${account.lastname}`}</Td>
         <Td>{account.course}</Td>
 
@@ -74,7 +85,7 @@ const StaffListTable = ({
             color="white"
             leftIcon={<DeleteIcon />}
             onClick={() => {
-              handleDelete(account._id);
+              handleDeleteAccounts(account._id);
             }}
             _hover={{ bg: "red.600" }}
           >
@@ -85,17 +96,10 @@ const StaffListTable = ({
 
     ));
 
-  const filteredStaff = accounts.filter((account) => account.role === "staff");   
+  const filteredStaff = data.filter((account) => account.role === "staff");
 
   const pageCount = Math.ceil(filteredStaff.length / staffPerPage);
 
-  const handleDelete = (id) => {
-    setDeleteAccount(id);
-    // Reset the current page if it exceeds the new number of pages after deletion
-    if (currentPage >= Math.ceil((filteredStaff.length - 1) / staffPerPage)) {
-      setCurrentPage(Math.max(0, currentPage - 1));
-    }
-  };
 
   return (
     <>
@@ -105,7 +109,7 @@ const StaffListTable = ({
             <Table variant="simple" w="100%">
               <Thead>
                 <Tr>
-                  <Th>Faculty ID</Th >
+                  <Th>STAFF ID</Th >
                   <Th w="30%">Name</Th>
                   <Th w="20%">Position</Th>
 
@@ -118,18 +122,12 @@ const StaffListTable = ({
                     {displayStaff}
                   </>
                 ) : (
-
-                  <Flex justify="center" align="center" pos="absolute"
-                    top="50%"
-                    left="50%"
-                    transform="translate(-50%, -50%)">
-                    <Text fontSize="1.5rem" fontWeight="bold">No Accouts Display</Text>
-
+                  <Flex justify="center" align="center" h="60vh">
+                    <Text fontSize="1.5rem" fontWeight="bold">No Accounts Display</Text>
                   </Flex>
-
-
                 )}
               </Tbody>
+
             </Table >
           </Box >
 
@@ -149,6 +147,7 @@ const StaffListTable = ({
               </Box>
             )
           }
+
         </Box >
       )}
     </>

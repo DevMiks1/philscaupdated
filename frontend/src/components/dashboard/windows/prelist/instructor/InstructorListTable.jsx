@@ -9,14 +9,16 @@ import { Box, Button, Flex, Table, Tbody, Td, Text, Th, Thead, Tr } from "@chakr
 import { Spinner } from "@chakra-ui/react";
 import React, { useState } from 'react';
 import ReactPaginate from 'react-paginate';
+import { useData } from '../../../../context/FetchAccountContext';
 
 const InstructorListTable = ({
-  accounts,
-  setDeleteAccount,
+ 
+  handleDeleteAccount,
   handleViewAccount,
   handleEditAccount,
-  loading
+  
 }) => {
+  const { data, loading, setData } = useData();
   const [currentPage, setCurrentPage] = useState(0);
   const facultyPerPage = 5;
 
@@ -26,7 +28,7 @@ const InstructorListTable = ({
     setCurrentPage(selected);
   };
 
-  
+
 
   const handleViewAccounts = (id) => {
     handleViewAccount(id);
@@ -36,14 +38,22 @@ const InstructorListTable = ({
     handleEditAccount(id);
   };
 
-  
+  const handleDeleteAccounts = (id) => {
+    handleDeleteAccount(id);
+    console.log(id)
+    if (
+      currentPage >= Math.ceil((filteredFaculty.length - 1) / facultyPerPage)
+    ) {
+      setCurrentPage(Math.max(0, currentPage - 1));
+    }
+  };
 
-  const displayFaculty = accounts
+  const displayFaculty = data
     .filter((account) => account.role === "faculty")
     .slice(currentPage * facultyPerPage, (currentPage + 1) * facultyPerPage)
     .map((account) => (
       <Tr key={account._id}>
-        <Td>{account.userId}</Td>
+        <Td>{account.schoolid}</Td>
         <Td>{`${account.firstname} ${account.suffix} ${account.lastname}`}</Td>
         <Td>{account.position}</Td>
 
@@ -74,7 +84,7 @@ const InstructorListTable = ({
             color="white"
             leftIcon={<DeleteIcon />}
             onClick={() => {
-              handleDelete(account._id);
+              handleDeleteAccounts(account._id);
             }}
             _hover={{ bg: "red.600" }}
           >
@@ -84,17 +94,10 @@ const InstructorListTable = ({
       </Tr>
     ));
 
-    const filteredFaculty = accounts.filter((account) => account.role === "faculty");
-    const pageCount = Math.ceil(filteredFaculty.length / facultyPerPage);
-    console.log(filteredFaculty);
+  const filteredFaculty = data.filter((account) => account.role === "faculty");
+  const pageCount = Math.ceil(filteredFaculty.length / facultyPerPage);
 
-    const handleDelete = (id) => {
-      setDeleteAccount(id);
-      // Reset the current page if it exceeds the new number of pages after deletion
-      if (currentPage >= Math.ceil((filteredFaculty.length - 1) / facultyPerPage)) {
-        setCurrentPage(Math.max(0, currentPage - 1));
-      }
-    };
+ 
   // console.log(filteredFaculty);
 
 
@@ -119,15 +122,12 @@ const InstructorListTable = ({
                     {displayFaculty}
                   </>
                 ) : (
-                  <Flex justify="center" align="center" pos="absolute"
-                    top="50%"
-                    left="50%"
-                    transform="translate(-50%, -50%)">
-                    <Text fontSize="1.5rem" fontWeight="bold">No Accouts Display</Text>
-
+                  <Flex justify="center" align="center" h="60vh">
+                    <Text fontSize="1.5rem" fontWeight="bold">No Accounts Display</Text>
                   </Flex>
                 )}
               </Tbody>
+
             </Table >
           </Box >
 

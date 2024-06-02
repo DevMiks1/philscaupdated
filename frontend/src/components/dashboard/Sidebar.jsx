@@ -10,6 +10,7 @@ import {
   DrawerOverlay,
   Flex,
   Icon,
+  ListIcon,
   Spacer,
   Text,
   VStack,
@@ -22,36 +23,26 @@ import {
   FaChartBar,
   FaBox,
   FaUsers,
-  FaHeadset,
-  FaShoppingCart,
-  FaUserFriends,
+  FaList,
+  FaFileAlt,
+  FaCog,
+
 } from "react-icons/fa";
-import { FiMenu, FiMessageSquare } from "react-icons/fi";
+import { FiMenu } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import Profile from "./Profile";
 import React, { useEffect, useState } from "react";
-import { fetchAccountAPI, retrieveUserDB } from "../api/AccountsApi";
+import { fetchAccountAPI } from "../api/AccountsApi";
 import { useAuth } from "../context/Auth";
+import { useData } from "../context/FetchAccountContext";
 
-export const SideBar = ({ setTab, tab, allUsers, setAllUsers }) => {
+export const SideBar = ({ setTab, tab, }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-
+  const { data, loading, setData } = useData();
+  console.log(data);
   const auth = useAuth();
 
   const authId = auth.user._id;
-
-  const fetchAllUsers = async () => {
-    try {
-      const data = await fetchAccountAPI();
-      setAllUsers(data.filter((el) => el._id === authId));
-    } catch (error) {
-      console.error("Error fetching all users:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchAllUsers();
-  }, []);
 
   const sideBarClose = () => {
     onClose();
@@ -59,7 +50,7 @@ export const SideBar = ({ setTab, tab, allUsers, setAllUsers }) => {
 
   // SIDE BAR
   return (
-    <div className="px-3 sticky top-0 h-[100vh]  ">
+    <Box pos="fixed" left={0} top={0} bg="purple.400" h="100vh" px={3}  w={{ md: "8%", lg: "20%", xl: "20%" }}>
       {/* DRAWER BUTTON */}
       <Box
         cursor="pointer"
@@ -70,9 +61,10 @@ export const SideBar = ({ setTab, tab, allUsers, setAllUsers }) => {
       >
         <Icon as={FiMenu} boxSize={6} />
       </Box>
+
       <Flex flexDir="column" justify="space-between" h="100%" py={5}>
         <VStack display={{ base: "none", md: "none", lg: "block" }} spacing={2}>
-          {allUsers.map((user) => {
+          {data.map((user) => {
             if (user.role === "admin" && user._id === authId) {
               return (
                 <React.Fragment key={user._id}>
@@ -118,8 +110,8 @@ export const SideBar = ({ setTab, tab, allUsers, setAllUsers }) => {
                         borderRadius: "5",
                       }}
                     >
-                      <Icon as={FaChartBar} />
-                      <Text as="p">Student ID List</Text>
+                      <Icon as={FaList  } />
+                      <Text as="p">ID List</Text>
                     </Flex>
                   </Link>
                   <Link
@@ -143,7 +135,7 @@ export const SideBar = ({ setTab, tab, allUsers, setAllUsers }) => {
                         borderRadius: "5",
                       }}
                     >
-                      <Icon as={FaBox} />
+                      <Icon as={FaChartBar} />
                       <Text>Graphs&Analytics</Text>
                     </Flex>
                   </Link>
@@ -166,7 +158,7 @@ export const SideBar = ({ setTab, tab, allUsers, setAllUsers }) => {
                         borderRadius: "5",
                       }}
                     >
-                      <Icon as={FaBox} />
+                      <Icon as={FaFileAlt } />
                       <Text>Reports</Text>
                     </Flex>
                   </Link>
@@ -189,7 +181,7 @@ export const SideBar = ({ setTab, tab, allUsers, setAllUsers }) => {
                         borderRadius: "5",
                       }}
                     >
-                      <Icon as={FaUsers} />
+                      <Icon as={FaCog } />
                       <Text>Settings</Text>
                     </Flex>
                   </Link>
@@ -200,7 +192,7 @@ export const SideBar = ({ setTab, tab, allUsers, setAllUsers }) => {
             }
           })}
 
-          {allUsers
+          {data
             .filter(
               (user) =>
                 ["student", "faculty", "staff"].includes(user.role) &&
@@ -259,8 +251,8 @@ export const SideBar = ({ setTab, tab, allUsers, setAllUsers }) => {
               
             ))}
         </VStack>
-        <Box display={{ base: "none", md: "none", lg: "block" }}>
-          <Profile allUsers={allUsers} authId={authId} />
+        <Box display={{ base: "block", md: "block", lg: "block" }}>
+          <Profile allUsers={data} authId={authId} />
         </Box>
       </Flex>
 
@@ -272,7 +264,7 @@ export const SideBar = ({ setTab, tab, allUsers, setAllUsers }) => {
             <DrawerBody p={0} className="bg-gray-800 text-white">
               <Flex flexDir="column" justify="space-between" h="100%" py={5}>
                 <Flex flexDir="column" mt={5} px={3}>
-                  {allUsers.map((user) => {
+                  {data.map((user) => {
                     if (user.role === "admin" && user._id === authId) {
                       return (
                         <React.Fragment key={user._id}>
@@ -409,7 +401,7 @@ export const SideBar = ({ setTab, tab, allUsers, setAllUsers }) => {
                     }
                   })}
 
-                  {allUsers
+                  {data
                     .filter(
                       (user) =>
                         ["student", "faculty", "staff"].includes(user.role) &&
@@ -473,13 +465,13 @@ export const SideBar = ({ setTab, tab, allUsers, setAllUsers }) => {
                   {/* Render other user links here */}
                 </Flex>
                 <Box>
-                  <Profile allUsers={allUsers} authId={authId} />
+                  <Profile allUsers={data} authId={authId} />
                 </Box>
               </Flex>
             </DrawerBody>
           </DrawerContent>
         </DrawerOverlay>
       </Drawer>
-    </div>
+    </Box>
   );
 };

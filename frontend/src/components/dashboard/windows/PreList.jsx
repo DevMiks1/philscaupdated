@@ -17,21 +17,23 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import StudentListTable from "./prelist/student/StudentListTable";
 import { DeleteAccountModal } from "./prelist/student/crud_prelist/DeleteAccount";
-import { fetchAccountAPI } from "../../api/AccountsApi";
 import ViewAccount from "./prelist/student/crud_prelist/ViewAccount";
 import EditAccount from "./prelist/student/crud_prelist/EditAccount";
 import InstructorListTable from "./prelist/instructor/InstructorListTable";
 import StaffListTable from "./prelist/staff/StaffListTable";
 import { AddIcon } from "@chakra-ui/icons";
 import GenerateAccount from "./prelist/GenerateAccount";
+import { useData } from "../../context/FetchAccountContext";
 
 const PreList = () => {
-  const [accounts, setAccounts] = useState([]);
+  // const [accounts, setAccounts] = useState([]);
   const [deleteAccount, setDeleteAccount] = useState(null);
   const [viewAccount, setViewAccount] = useState(null);
   const [editAccount, setEditAccount] = useState(null);
   const [generateAccount, setGenerateAccount] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { data, loading, setData } = useData();
+  console.log(deleteAccount);
+  // const [loading, setLoading] = useState(true);
   const {
     isOpen: isViewOpen,
     onOpen: onViewOpen,
@@ -49,41 +51,41 @@ const PreList = () => {
     onClose: onGenerateClose,
   } = useDisclosure();
 
- 
-  
-  
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose,
+  } = useDisclosure();
 
-  useEffect(() => {
-    const fetchAccount = async () => {
-      try {
-        const data = await fetchAccountAPI();
-        setAccounts(data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setLoading(false)
-      }
-    };
-
-    fetchAccount();
-  }, [accounts]);
 
   const handleViewAccount = (accountId) => {
-    const account = accounts.find((acc) => acc._id === accountId);
+    const account = data.find((acc) => acc._id === accountId);
     setViewAccount(account);
     onViewOpen();
   };
 
   const handleEditAccount = (accountId) => {
-    const account = accounts.find((acc) => acc._id === accountId);
+    const account = data.find((acc) => acc._id === accountId);
     setEditAccount(account);
     onEditOpen();
   };
+
+  const handleDeleteAccount = (accountId) => {
+    const account = data.find((acc) => acc._id === accountId);
+    if (account) {
+      setDeleteAccount({ ...account }); // Make sure to include all fields from account
+      onDeleteOpen();
+    }
+  };
+  
 
   const handleGenerateModalOpen = () => {
     setGenerateAccount(true);
     onGenerateOpen();
   };
+
+ 
+  
 
   return (
     <>
@@ -107,9 +109,8 @@ const PreList = () => {
             <List>
               <ListItem>
                 <StudentListTable
-                  loading={loading}
-                  accounts={accounts}
-                  setDeleteAccount={setDeleteAccount}
+                  
+                  handleDeleteAccount={handleDeleteAccount}
                   handleViewAccount={handleViewAccount}
                   handleEditAccount={handleEditAccount}
                 />
@@ -121,9 +122,8 @@ const PreList = () => {
             <List>
               <ListItem>
                 <InstructorListTable
-                loading={loading}
-                  accounts={accounts}
-                  setDeleteAccount={setDeleteAccount}
+                
+                handleDeleteAccount={handleDeleteAccount}
                   handleViewAccount={handleViewAccount}
                   handleEditAccount={handleEditAccount}
                 />
@@ -135,9 +135,8 @@ const PreList = () => {
             <List>
               <ListItem>
                 <StaffListTable
-                  loading={loading}
-                  accounts={accounts}
-                  setDeleteAccount={setDeleteAccount}
+                 
+                 handleDeleteAccount={handleDeleteAccount}
                   handleViewAccount={handleViewAccount}
                   handleEditAccount={handleEditAccount}
                 />
@@ -149,10 +148,10 @@ const PreList = () => {
 
       {deleteAccount && (
         <DeleteAccountModal
-          accounts={accounts}
-          setAccounts={setAccounts}
-          setDeleteAccount={setDeleteAccount}
-          deleteAccount={deleteAccount}
+        isOpen={isDeleteOpen}
+        onClose={onDeleteClose}
+        deleteAccount={deleteAccount}
+        setDeleteAccount={setDeleteAccount}
         />
       )}
 
@@ -173,7 +172,7 @@ const PreList = () => {
         />
       )}
       {generateAccount && (
-        <GenerateAccount isOpen={isGenerateOpen} onClose={onGenerateClose} accounts={accounts}/>
+        <GenerateAccount isOpen={isGenerateOpen} onClose={onGenerateClose} accounts={data}/>
       )}
     </>
   );

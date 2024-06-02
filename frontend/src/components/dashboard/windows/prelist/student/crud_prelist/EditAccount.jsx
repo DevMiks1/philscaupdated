@@ -21,9 +21,14 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { updateAccountAPI } from "../../../../../api/AccountsApi";
+import { useData } from "../../../../../context/FetchAccountContext";
 
 
 const EditAccount = ({ isOpen, onClose, account }) => {
+  const { data, setData } = useData();
+  const [isLoading, setIsLoading] = useState(false);
+
+
   const toast = useToast();
 
   const [formData, setFormData] = useState(
@@ -43,6 +48,7 @@ const EditAccount = ({ isOpen, onClose, account }) => {
   };
 
   const handleSubmit = async () => {
+    setIsLoading(true);
     try {
       toast({
         title: "Update Successfully",
@@ -55,10 +61,18 @@ const EditAccount = ({ isOpen, onClose, account }) => {
       // Make sure formData has the _id field for identifying the account
       const updatedAccount = { body: formData, _id: account._id };
 
-      await updateAccountAPI(updatedAccount);
-      onClose(); // Close the modal after successful update
+      const response = await updateAccountAPI(updatedAccount)
+      if (response) {
+        const updatedData = data.map((el) =>
+          el._id === account._id ? { ...el, ...formData } : el
+        );
+        setData(updatedData);
+        onClose(); // Close the modal after successful update
+      }
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -73,7 +87,7 @@ const EditAccount = ({ isOpen, onClose, account }) => {
         <ModalCloseButton />
 
         <ModalBody>
-
+    
           <FormControl pb={5}>
             <FormLabel>{employee ? "Employee ID" : "Student ID"}</FormLabel>
             <Input
@@ -225,7 +239,7 @@ const EditAccount = ({ isOpen, onClose, account }) => {
 
         </ModalBody>
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={handleSubmit}>
+          <Button colorScheme="blue" mr={3} onClick={handleSubmit} isLoading={isLoading}>
             Save
           </Button>
           <Button variant="ghost" onClick={onClose}>

@@ -2,16 +2,28 @@ import React, { useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import axios from "axios";
 import { MdDelete } from "react-icons/md";
-import { Box, Button, Flex, FormControl,  Heading, Input, InputGroup, InputRightElement, Text, useToast } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  FormControl,
+  Heading,
+  Input,
+  InputGroup,
+  InputRightElement,
+  Modal,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { deleteAccountAPI } from "../../../../../api/AccountsApi";
-export const DeleteAccountModal = ({
-  accounts,
-  setAccounts,
-  setDeleteAccount,
-  deleteAccount,
+import { useData } from "../../../../../context/FetchAccountContext";
+export const DeleteAccountModal = ({ isOpen, onClose, deleteAccount, setDeleteAccount }) => {
+  console.log(deleteAccount._id)
+  
+  const { data, setData } = useData();
+  const [isLoading, setIsLoading] = useState(false);
 
-}) => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
@@ -24,24 +36,32 @@ export const DeleteAccountModal = ({
 
   //   CREATE USERACCOUNTS DATABASE
   const deleteAccountDB = async () => {
+    setIsLoading(true);
     try {
-      const response = await deleteAccountAPI({ _id: deleteAccount });
+      const response = await deleteAccountAPI({ _id: deleteAccount._id });
       if (response) {
         // REALTIME
         // Assuming allUsers is your state array
-        let newAccounts = [
-          ...accounts.filter((el) => el._id !== deleteAccount),
-        ]; // Copying the state array
-        setAccounts([...newAccounts]);
-        console.log(...newAccounts);
-        setDeleteAccount(null);
+        let newAccounts = [...data.filter((el) => el._id !== deleteAccount._id)]; // Copying the state array
+        setData([...newAccounts]);
+        onClose();
+        toast({
+          title: "Delete Successfully",
+          status: "success",
+          duration: "1000",
+          isClosable: true,
+          position: "top",
+        });
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
   const validate = () => {
-    const accountToDelete = accounts.find((acc) => acc._id === deleteAccount);
+    const accountToDelete = data.find((acc) => acc._id === deleteAccount._id);
+
 
     if (!accountToDelete) {
       console.log("Account not found");
@@ -49,13 +69,6 @@ export const DeleteAccountModal = ({
     }
     if (accountToDelete.password === password) {
       
-      toast({
-        title: "Delete Successfully",
-        status: "success",
-        duration: "1000",
-        isClosable: true,
-        position: "top",
-      });
       deleteAccountDB();
     } else {
       // alert("Password is incorrect");
@@ -71,29 +84,14 @@ export const DeleteAccountModal = ({
   };
 
   return (
+    <Modal isOpen={isOpen} onClose={onClose} size="lg">
     <div
-      className="inset-0 fixed backdrop-blur-xl flex justify-center items-center overflow-auto "
-      style={{ zIndex: 10000000 }}>
+      className="inset-0 fixed  flex justify-center items-center overflow-auto "
+      style={{ zIndex: 10000000 }}
+    >
       <div className="bg-gray-800 text-white shadow-2xl min-w-[500px] min-h-[400px] h-[40vh] w-[30vw] rounded-2xl overflow-auto flex flex-col items-center justify-center">
-        {/* CLOSE BUTTON */}
-        <Flex justify="end" h="10%" w="100%">
-          <Button
-            colorScheme="lime"
-            
-            fontSize="24px"
-            fontWeight="semibold"
-            borderWidth={0}
-            borderRadius="md"
-            transition="all 0.3s"
-            _hover={{
-              boxShadow: 'xl',
-              color: "gray.400"
+        
 
-              }}
-            onClick={() => setDeleteAccount(null)}>
-            <IoMdClose/>
-          </Button>
-        </Flex>
         <div className="w-full h-[90%] flex justify-center">
           <Flex flexDir="column" justify="center" align="center">
             <Heading as="h2" fontSize="20px" fontWeight="semibold" mb={10}>
@@ -102,29 +100,26 @@ export const DeleteAccountModal = ({
             <Heading as="h2" fontSize="20px" fontWeight="semibold" mb={5}>
               Please type your password to continue
             </Heading>
-        
+
             <FormControl id="password" isRequired mb={10} w="80%">
-                
-                <InputGroup>
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter Your Password"
-                    
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                  <InputRightElement w="4.5rem" pb={2}>
-                    <Box
-                      onClick={handleShowPassword}
-                      _hover={{ cursor: "pointer", color: "#3182CE" }}
-                      fontSize="2xl"
-                    >
-                      {showPassword ? <ViewOffIcon /> : <ViewIcon />}
-                    </Box>
-                  </InputRightElement>
-                </InputGroup>
-              </FormControl>
+              <InputGroup>
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter Your Password"
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <InputRightElement w="4.5rem" pb={2}>
+                  <Box
+                    onClick={handleShowPassword}
+                    _hover={{ cursor: "pointer", color: "#3182CE" }}
+                    fontSize="2xl"
+                  >
+                    {showPassword ? <ViewOffIcon /> : <ViewIcon />}
+                  </Box>
+                </InputRightElement>
+              </InputGroup>
+            </FormControl>
             <Flex w="100%" justify="center" gap={4}>
-              
               <Button
                 colorScheme="lime"
                 size="md"
@@ -135,19 +130,19 @@ export const DeleteAccountModal = ({
                 borderWidth={2}
                 borderColor="green.600"
                 transition="all 0.3s"
-                
-                onClick={()=> setDeleteAccount(null)}
-                _hover={{    
-                  borderColor: 'green.500',
-                  boxShadow: 'xl',
-                  color: "gray.300"
-                }}>
-                <Flex align="center" gap={2}>
+                _hover={{
+                  borderColor: "green.500",
+                  boxShadow: "xl",
+                  color: "gray.300",
+                }}
+              >
+                <Flex align="center" gap={2} onClick={()=> setDeleteAccount(null)}>
                   <Text>Cancel</Text>
                   <IoMdClose />
                 </Flex>
               </Button>
               <Button
+               
                 colorScheme="lime"
                 size="md"
                 fontWeight="semibold"
@@ -157,13 +152,14 @@ export const DeleteAccountModal = ({
                 borderWidth={2}
                 borderColor="red.600"
                 transition="all 0.3s"
-                
+                isLoading={isLoading}
                 onClick={validate}
-                _hover={{    
-                  borderColor: 'red.500',
-                  boxShadow: 'xl',
-                  color: "gray.300"
-                }}>
+                _hover={{
+                  borderColor: "red.500",
+                  boxShadow: "xl",
+                  color: "gray.300",
+                }}
+              >
                 <Flex align="center" gap={2}>
                   <Text>Delete</Text>
                   <MdDelete />
@@ -174,5 +170,6 @@ export const DeleteAccountModal = ({
         </div>
       </div>
     </div>
+    </Modal>
   );
 };

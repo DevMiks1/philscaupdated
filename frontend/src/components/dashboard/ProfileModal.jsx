@@ -11,11 +11,15 @@ const ProfileModal = ({ setProfile, handleLogout }) => {
       boxShadow="md"
       
       py={4}
-      position="relative"
+      position="absolute"
       h="150px"
       w="210px"
-      mb={5}
-      ml="3rem"
+      right={0}
+      bottom={0}
+      mr={3}
+      mb="7rem"
+      // mb={5}
+      // ml="3rem"
 
       zIndex={9999}
     >
@@ -27,7 +31,8 @@ const ProfileModal = ({ setProfile, handleLogout }) => {
         colorScheme="blackAlpha"
         position="absolute"
         top="5px"
-        right="5px"
+        right={0}
+        mr={1}
         onClick={() => setProfile(false)}
       />
 

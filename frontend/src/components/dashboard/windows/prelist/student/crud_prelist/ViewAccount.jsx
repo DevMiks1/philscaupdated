@@ -39,8 +39,8 @@ const ViewAccount = ({ isOpen, onClose, account }) => {
               <Avatar name={`${account.firstname}`} src={account.picture} />
             </WrapItem>
           </Wrap>
-          <Box w="100%">
-            <ModalHeader>{account.userId}</ModalHeader>
+          <Box w="100%" pt={1}>
+            <ModalHeader>{account.schoolid}</ModalHeader>
           </Box>
         </Flex>
         <ModalCloseButton />
@@ -54,35 +54,39 @@ const ViewAccount = ({ isOpen, onClose, account }) => {
               py={2}
               px={3}
               borderRadius={10}
-              h={account.name ? "80px" : "80px"}
+              h={account.firstname ? "80px" : "80px"}
             >
               <Text fontWeight="bold">Name:</Text>
               {`${account.firstname} ${account.suffix} ${account.lastname}`}
             </Box>
             {students && (
-              <Box
-                bg="gray.600"
-                color="white"
-                w="100%"
-                py={2}
-                px={3}
-                borderRadius={10}
-              >
-                <Text fontWeight="bold">Course:</Text>
-                {account.course}
-              </Box>
+              <>
+                <Box
+                  bg="gray.600"
+                  color="white"
+                  w="100%"
+                  py={2}
+                  px={3}
+                  borderRadius={10}
+                >
+                  <Text fontWeight="bold">Course:</Text>
+                  {account.course}
+                </Box>
+                <Box
+                  bg="gray.600"
+                  color="white"
+                  w="100%"
+                  py={2}
+                  px={3}
+                  borderRadius={10}
+                  h={account.year ? "80px" : "80px"}
+                >
+                  <Text fontWeight="bold">Year:</Text>
+                  {account.year}
+                </Box>
+              </>
             )}
-            <Box
-              bg="gray.600"
-              color="white"
-              w="100%"
-              py={2}
-              px={3}
-              borderRadius={10}
-            >
-              <Text fontWeight="bold">Address:</Text>
-              {account.address}
-            </Box>
+
             {employee && (
               <Box
                 bg="gray.600"
@@ -110,10 +114,10 @@ const ViewAccount = ({ isOpen, onClose, account }) => {
                   py={2}
                   px={3}
                   borderRadius={10}
-                  h={account.year ? "80px" : "80px"}
+                  h="70px"
                 >
-                  <Text fontWeight="bold">Year:</Text>
-                  {account.year}
+                  <Text fontWeight="bold">Birthdate:</Text>
+                  {formattedDate}
                 </Box>
                 <Box
                   bg="gray.600"
@@ -125,6 +129,18 @@ const ViewAccount = ({ isOpen, onClose, account }) => {
                 >
                   <Text fontWeight="bold">Contact Person:</Text>
                   {account.contactperson}
+                </Box>
+
+                <Box
+                  bg="gray.600"
+                  color="white"
+                  w="100%"
+                  py={2}
+                  px={3}
+                  borderRadius={10}
+                >
+                  <Text fontWeight="bold">Contact No:</Text>
+                  {account.contactnumber}
                 </Box>
               </>
             )}
@@ -202,33 +218,22 @@ const ViewAccount = ({ isOpen, onClose, account }) => {
         )}
         <ModalBody>
           <Flex gap={3}>
-            <Box
+          <Box
               bg="gray.600"
               color="white"
               w="100%"
               py={2}
               px={3}
               borderRadius={10}
-              h="70px"
+              h={account.address ? "80px" : "80px"}
             >
-              <Text fontWeight="bold">Birthdate:</Text>
-              {formattedDate}
-            </Box>
-            <Box
-              bg="gray.600"
-              color="white"
-              w="100%"
-              py={2}
-              px={3}
-              borderRadius={10}
-            >
-              <Text fontWeight="bold">Contact No:</Text>
-              {account.contactnumber}
+              <Text fontWeight="bold">Address:</Text>
+              {account.address}
             </Box>
           </Flex>
         </ModalBody>
         <ModalBody>
-          <Flex gap={3}>
+          <Flex gap={3} pb={2}>
             <Box
               bg="gray.600"
               color="white"

@@ -30,7 +30,7 @@ const Profile = ({ allUsers, authId }) => {
       )}
 
       {allUsers
-        .filter((user) => ["admin", "faculty", "staff"].includes(user.role) && user._id === authId)
+        .filter((user) => ["admin", "faculty", "staff","student"].includes(user.role) && user._id === authId)
         .map((user) => (
           <Box border="2px solid #CDCACA" w="100%" key={user._id}>
 

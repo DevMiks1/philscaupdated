@@ -1,36 +1,34 @@
-import React, { useState, useEffect } from 'react';
+/** @format */
+
+import React, { useState, } from "react";
 import {
-  Box, Button, Table, TableCaption, TableContainer,
-  Tbody, Td, Tfoot, Th, Thead, Tr, Input, Select,
-  Flex, Menu, MenuButton, MenuList, MenuItem,
-} from '@chakra-ui/react';
-import IdModal from './prelist/student/idmodal/IdModal';
-import { fetchAccountAPI } from '../../api/AccountsApi';
-import { ViewIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
-import ReactPaginate from 'react-paginate';
+  Box,
+  Input,
+  Select,
+  Flex,
+  Tabs,
+  TabList,
+  Tab,
+  Spacer,
+  TabPanels,
+  TabPanel,
+  List,
+  ListItem,
+} from "@chakra-ui/react";
+import IdModal from "./prelist/student/idmodal/IdModal";
+import { useData } from "../../context/FetchAccountContext";
+import StudentId from "./StudentId";
+import StaffId from "./StaffId";
+import FacultyId from "./FacultyId";
 
 export default function StudIDList() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
-  const [studentData, setStudentData] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterCriteria, setFilterCriteria] = useState('');
 
-  const studentsPerPage = 4;
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await fetchAccountAPI();
-        setStudentData(data);
-      } catch (error) {
-        console.error("Error fetching student data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterCriteria, setFilterCriteria] = useState("issued"); // Default filter criteria set to 'issued'
+  const { data } = useData();
 
   const handleViewClick = (student) => {
     setSelectedStudent(student);
@@ -46,38 +44,9 @@ export default function StudIDList() {
     setCurrentPage(selected);
   };
 
-  const pageCount = Math.ceil(studentData.length / studentsPerPage);
-
-  const filteredStudents = studentData
-    .filter(student => {
-      const fullName = `${student.firstname} ${student.lastname}`;
-      return fullName.toLowerCase().includes(searchQuery.toLowerCase());
-    })
-    .filter(student => {
-      if (filterCriteria === '') return true;
-      return student.course === filterCriteria;
-    })
-    .slice(currentPage * studentsPerPage, (currentPage + 1) * studentsPerPage);
-
-  const displayStudents = filteredStudents.map(student => (
-    <Tr key={student.userId}>
-      <Td>{student.firstname} {student.lastname}</Td>
-      <Td>{student.course}</Td>
-      <Td>
-        <Button
-          size="sm"
-          leftIcon={<ViewIcon />}
-          onClick={() => handleViewClick(student)}
-        >
-          View
-        </Button>
-      </Td>
-    </Tr>
-  ));
-
   return (
     <>
-      <Box margin={10}>
+      <Box mt={10} mx={10} mb={2}>
         <Flex gap={5}>
           <Box>
             <Input
@@ -88,63 +57,79 @@ export default function StudIDList() {
           </Box>
           <Box>
             <Select
-              placeholder="Filter by course"
               value={filterCriteria}
               onChange={(e) => setFilterCriteria(e.target.value)}
             >
-              <option value="">All Courses</option>
-              <option value="BSIT">BSIT</option>
-              <option value="BSCS">BSCS</option>
+              <option value="issued">Issued</option>
+              <option value="non-issued">Non-Issued</option>
             </Select>
           </Box>
         </Flex>
       </Box>
 
-      <TableContainer mb={4}>
-        <Table variant='simple'>
-          <TableCaption>Student ID List</TableCaption>
-          <Thead>
-            <Tr>
-              <Th>Name</Th>
-              <Th>Course</Th>
-              <Th>Action</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {displayStudents.length > 0 ? (
-              displayStudents
-            ) : (
-              <Tr>
-                <Td colSpan={3} textAlign="center">
-                  No Students Available
-                </Td>
-              </Tr>
-            )}
-          </Tbody>
-          <Tfoot>
-            <Tr>
-              <Th>Name</Th>
-              <Th>Course</Th>
-              <Th>Action</Th>
-            </Tr>
-          </Tfoot>
-        </Table>
-      </TableContainer>
+      <Tabs colorScheme="purple" variant="enclosed">
+        <TabList py={10} px={5}>
+          <Tab _selected={{ color: "white", bg: "purple.400" }}>Students</Tab>
+          <Tab _selected={{ color: "white", bg: "purple.400" }}>Faculty</Tab>
+          <Tab _selected={{ color: "white", bg: "purple.400" }}>Staff</Tab>
+        </TabList>
 
-      {studentData.length > studentsPerPage && (
-        <Box h="10vh" pt={10}>
-          <ReactPaginate
-            pageCount={pageCount}
-            pageRangeDisplayed={3}
-            marginPagesDisplayed={2}
-            onPageChange={handlePageClick}
-            containerClassName={"pagination"}
-            activeClassName={"active"}
-            previousLabel={<ChevronLeftIcon />}
-            nextLabel={<ChevronRightIcon />}
-          />
-        </Box>
-      )}
+        <TabPanels>
+          <TabPanel>
+            <List>
+              <ListItem>
+                <StudentId
+                  data={data}
+                  filterCriteria={filterCriteria}
+                  searchQuery={searchQuery}
+                  handleViewClick={handleViewClick}
+                  currentPage={currentPage}
+                  handlePageClick={handlePageClick}
+                  // setDeleteAccount={setDeleteAccount}
+                  // handleViewAccount={handleViewAccount}
+                  // handleEditAccount={handleEditAccount}
+                />
+              </ListItem>
+            </List>
+          </TabPanel>
+
+          <TabPanel>
+            <List>
+              <ListItem>
+                <StaffId
+                  data={data}
+                  filterCriteria={filterCriteria}
+                  searchQuery={searchQuery}
+                  handleViewClick={handleViewClick}
+                  currentPage={currentPage}
+                  handlePageClick={handlePageClick}
+                  // setDeleteAccount={setDeleteAccount}
+                  // handleViewAccount={handleViewAccount}
+                  // handleEditAccount={handleEditAccount}
+                />
+              </ListItem>
+            </List>
+          </TabPanel>
+
+          <TabPanel>
+            <List>
+              <ListItem>
+                <FacultyId
+                  data={data}
+                  filterCriteria={filterCriteria}
+                  searchQuery={searchQuery}
+                  handleViewClick={handleViewClick}
+                  currentPage={currentPage}
+                  handlePageClick={handlePageClick}
+                  // setDeleteAccount={setDeleteAccount}
+                  // handleViewAccount={handleViewAccount}
+                  // handleEditAccount={handleEditAccount}
+                />
+              </ListItem>
+            </List>
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
 
       {selectedStudent && (
         <IdModal

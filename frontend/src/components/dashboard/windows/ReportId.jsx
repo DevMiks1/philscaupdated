@@ -2,10 +2,6 @@
 
 import {
   Box,
-  Flex,
-  FormControl,
-  FormLabel,
-  Input,
   Text,
 } from "@chakra-ui/react";
 import React from "react";

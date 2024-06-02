@@ -2,82 +2,111 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   DeleteIcon,
+  DownloadIcon,
   EditIcon,
   ViewIcon,
 } from "@chakra-ui/icons";
-import { Box, Button, Flex, Table, Tbody, Td, Text, Th, Thead, Tr, Spinner } from "@chakra-ui/react";
+import { Box, Button, Flex, Table, Tbody, Td, Text, Th, Thead, Tr, Spinner, useDisclosure } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
-import { useAuth } from "../../context/Auth";
 import { fetchAccountAPI } from "../../api/AccountsApi";
+import ModalAffidavit from "./ModalAffidavit";
+import { useData } from "../../context/FetchAccountContext";
 
 const Reports = ({
-  accounts,
-  setDeleteAccount,
-  handleViewAccount,
-  handleEditAccount,
-  loading,
-}) => {
-  const [allUsers, setAllUsers] = useState([]);
 
+}) => {
   const [currentPage, setCurrentPage] = useState(0);
+  const [viewAccount, setViewAccount] = useState(null);
+  const { data, loading, setData } = useData();
+
+  const {
+    isOpen: isViewOpen,
+    onOpen: onViewOpen,
+    onClose: onViewClose,
+  } = useDisclosure();
+
   const reportsPerPage = 5;
 
   const handlePageClick = ({ selected }) => {
     setCurrentPage(selected);
   };
 
-  const auth = useAuth();
-  const authId = auth.user._id;
-  const fetchAllUsers = async () => {
-    try {
-      const data = await fetchAccountAPI();
-      setAllUsers(data.filter((el) => ["student", "faculty", "staff"].includes(el.role) && el.affidavit !== "" && el.affidavit !== null));
-    } catch (error) {
-      console.error("Error fetching all users:", error);
-    }
+  
+
+  const handleViewAccounts = (id) => {
+    handleViewAccount(id);
   };
-  
-  
-  
 
-  useEffect(() => {
-    fetchAllUsers();
-  }, []);
+  const handleViewAccount = (accountId) => {
+    const account = data.find((acc) => acc._id === accountId);
+    setViewAccount(account);
+    onViewOpen();
+  };
 
-  const displayReports = allUsers
+ 
+  const filteredRecords = data
+    .filter((acc) => acc.affidavit)
+  console.log(filteredRecords);
+
+
+
+  const displayReports = filteredRecords
     ?.slice(currentPage * reportsPerPage, (currentPage + 1) * reportsPerPage)
-    .map((account) => (
-      <Tr key={account._id}>
-        
-        <Td>{`${account.firstname} ${account.suffix} ${account.lastname}`}</Td>
-        <Td>{account.affidavit}</Td>
-        <Td>
-          <Button
-            size="sm"
-            bg="red.500"
-            color="white"
-            leftIcon={<DeleteIcon />}
-            onClick={() => {
-              handleDelete(account._id);
-            }}
-            _hover={{ bg: "red.600" }}
-          >
-            Download Reports
-          </Button>
-        </Td>
-      </Tr>
-    ));
+    .map((account) => {
+      console.log(account); // Log the account data
+      return (
+        <Tr key={account._id}>
+          <Td>{`${account.firstname} ${account.suffix} ${account.lastname}`}</Td>
+          <Td>
+            {account.affidavit && (
+              <img
+                src={account.affidavit}
+                alt="Affidavit"
+                style={{ maxWidth: '70px', maxHeight: '70px' }}
+              />
+            )}
+          </Td>
 
-  const pageCount = Math.ceil((allUsers?.length || 0) / reportsPerPage);
+          <Td>
+            <Button
+              size="sm"
+              leftIcon={<ViewIcon />}
+              mr={2}
+              onClick={() => {
+                handleViewAccounts(account._id);
+              }}
+            >
+              View
+            </Button>
+            {/* <Button
+              size="sm"
+              bg="red.500"
+              color="white"
+              leftIcon={<DownloadIcon />}
+              onClick={() => handleDownload(account.affidavit)}
+              _hover={{ bg: "red.600" }}
+            >
+              Download Image
+            </Button> */}
 
-  const handleDelete = (id) => {
-    setDeleteAccount(id);
-    // Reset the current page if it exceeds the new number of pages after deletion
-    if (currentPage >= Math.ceil(((allUsers?.length || 0) - 1) / reportsPerPage)) {
-      setCurrentPage(Math.max(0, currentPage - 1));
-    }
-  };
+          </Td>
+        </Tr>
+      );
+    });
+
+
+
+  console.log(displayReports);
+  const pageCount = Math.ceil((data?.length || 0) / reportsPerPage);
+
+  // const handleDelete = (id) => {
+  //   setDeleteAccount(id);
+  //   // Reset the current page if it exceeds the new number of pages after deletion
+  //   if (currentPage >= Math.ceil(((allUsers?.length || 0) - 1) / reportsPerPage)) {
+  //     setCurrentPage(Math.max(0, currentPage - 1));
+  //   }
+  // };
 
   return (
     <>
@@ -87,11 +116,11 @@ const Reports = ({
         </Flex>
       ) : (
         <Box as="section">
+          <Flex px={5} py={10} fontSize="30px" fontWeight="bold">Reports for Affidavit of Loss</Flex>
           <Box h="60vh" overflow="auto">
             <Table variant="simple" w="100%">
               <Thead>
                 <Tr>
-                 
                   <Th>Name</Th>
                   <Th>Affidavit</Th>
                   <Th>Actions</Th>
@@ -100,11 +129,13 @@ const Reports = ({
               <Tbody>
                 {displayReports.length > 0 ? (
                   <>
-                    {displayReports}
+                    {
+
+                      displayReports}
                   </>
                 ) : (
                   <Tr>
-                    <Td colSpan="4" textAlign="center">
+                    <Td colSpan="3" textAlign="center">
                       <Text fontSize="1.5rem" fontWeight="bold">No Reports Display</Text>
                     </Td>
                   </Tr>
@@ -126,8 +157,19 @@ const Reports = ({
               />
             </Box>
           )}
+
+          {viewAccount && (
+            <ModalAffidavit
+              isOpen={isViewOpen}
+              onClose={onViewClose}
+              account={viewAccount}
+            />
+          )}
+
+
         </Box>
       )}
+
     </>
   );
 };

@@ -35,6 +35,8 @@ const userSchema = new Schema({
     required: false,
   },
   affidavit: String,
+  schoolid: String,
+  message: String,
   email: { type: String, unique: true, required: true },
   password: { type: String, required: true },
 });

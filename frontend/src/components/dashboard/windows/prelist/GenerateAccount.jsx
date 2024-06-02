@@ -1,6 +1,5 @@
-/** @format */
-
-import React, { useEffect, useState } from "react";
+// Inside GenerateAccount component
+import React, { useContext, useState } from "react";
 import {
   useToast,
   Button,
@@ -17,22 +16,23 @@ import {
   Select,
   Box,
   InputGroup,
-  InputRightElement
+  InputRightElement,
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 
 import { createAccountAPI } from "../../../api/AccountsApi";
+import { useData } from "../../../context/FetchAccountContext";
 
-const GenerateAccount = ({ isOpen, onClose, accounts }) => {
+const GenerateAccount = React.memo(({ isOpen, onClose }) => {
+  const { data, setData } = useData();
 
   const [email, setEmail] = useState("");
+  const [schoolid, setSchoolid] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState("student"); // Default role is student
   const [isLoading, setIsLoading] = useState(false);
   const toast = useToast(); // Initialize useToast hook
-
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,20 +51,19 @@ const GenerateAccount = ({ isOpen, onClose, accounts }) => {
       contactnumber: "",
       birthdate: "",
       position: "",
-      designation:  "",
-      hgt: "", 
+      designation: "",
+      hgt: "",
       wgt: "",
       sss: "",
       tin: "",
       contactperson: "",
       affidavit: "",
-      
-
-
+      message: "",
+      schoolid: schoolid,
     };
 
     try {
-      const existingEmail = accounts.some((account) => account.email === email)
+      const existingEmail = data.some((account) => account.email === email);
 
       if (existingEmail) {
         toast({
@@ -75,10 +74,10 @@ const GenerateAccount = ({ isOpen, onClose, accounts }) => {
         });
       } else {
         // Call the createAccountAPI function with email, password, and role
-        await createAccountAPI({ body: body });
-        // Optionally, you can perform additional actions after account creation
-        console.log("Account created successfully!");
-        // Show success toast notification
+        const response = await createAccountAPI({ body });
+        const newAccount = { ...body, _id: response.data._id };
+        const newData = [...data, newAccount];
+        setData(newData);
         toast({
           title: "Account created successfully!",
           status: "success",
@@ -88,12 +87,11 @@ const GenerateAccount = ({ isOpen, onClose, accounts }) => {
         // Reset form fields
         setEmail("");
         setPassword("");
+        setSchoolid("")
         setRole("student"); // Reset the role to default
         // Close the modal after successful account creation
         onClose();
       }
-
-
     } catch (error) {
       console.error("Error creating account:", error);
       // Show error toast notification
@@ -124,6 +122,15 @@ const GenerateAccount = ({ isOpen, onClose, accounts }) => {
         <ModalBody>
           <form onSubmit={handleSubmit}>
             <Stack spacing={4}>
+            <FormControl id="email">
+                <FormLabel>ID Number</FormLabel>
+                <Input
+                  type="text"
+                  value={schoolid}
+                  onChange={(e) => setSchoolid(e.target.value)}
+                  required
+                />
+              </FormControl>
               <FormControl id="email">
                 <FormLabel>Email address</FormLabel>
                 <Input
@@ -171,6 +178,6 @@ const GenerateAccount = ({ isOpen, onClose, accounts }) => {
       </ModalContent>
     </Modal>
   );
-};
+});
 
 export default GenerateAccount;
